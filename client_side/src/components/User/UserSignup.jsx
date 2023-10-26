@@ -5,14 +5,21 @@ import {
   Button,
   Typography,
 } from "@material-tailwind/react";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { api } from "../../api/api";
+import { setUser, loginSuccess } from "../../redux/userSlice";
+import OAuth from "./UserGoogleAuth";
+import { showSuccess } from "../../assets/tostify";
 
 // eslint-disable-next-line react/prop-types
-export function SignupForm({closeSignupModal,openLoginModal}) {
+export function SignupForm({ closeSignupModal, openLoginModal }) {
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const initialValues = {
     name: "",
@@ -39,13 +46,21 @@ export function SignupForm({closeSignupModal,openLoginModal}) {
 
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
-      console.log(accessToken, "accessTokenoo");
-      console.log(refreshToken, "refreshTokenoo");
-      console.log("Registration success:", user);
 
+      const filteredUserData = {
+        _id: user._id,
+        name: user.name,
+        bio: user.bio,
+        profileImage: user.profileImage,
+      };
+
+      dispatch(setUser(filteredUserData));
+      dispatch(loginSuccess());
+      showSuccess(`Welcome Mr.${user.name}`)
       navigate("/home");
     } catch (error) {
       console.error("Registration error:", error);
+      setError("Registeration Error, try again maybe!!!");
     }
   };
 
@@ -58,6 +73,7 @@ export function SignupForm({closeSignupModal,openLoginModal}) {
   return (
     <div className="flex justify-center items-center h-full rounded-lg bg-gradient-to-br from-blue-500 to-teal-400">
       <Card color="transparent" shadow={false} className="w-80 max-w-md">
+        <small className="text-red-300">{error}</small>
         <Typography variant="h4" color="blue-gray">
           Sign Up
         </Typography>
@@ -131,15 +147,23 @@ export function SignupForm({closeSignupModal,openLoginModal}) {
               <small className="text-red-300">{formik.errors.agreeTerms}</small>
             )}
           </div>
-          <Button className="mt-6" fullWidth type="submit">
+          <Button className="mt-3" fullWidth type="submit">
             Register
           </Button>
           <Typography color="gray" className="mt-4 text-center font-normal">
             Already have an account?{" "}
-            <a href="#" className="font-medium text-gray-900" onClick={()=>{closeSignupModal();openLoginModal()}}>
+            <a
+              href="#"
+              className="font-medium text-gray-900"
+              onClick={() => {
+                closeSignupModal();
+                openLoginModal();
+              }}
+            >
               Sign In
             </a>
           </Typography>
+            <OAuth />
         </form>
       </Card>
     </div>

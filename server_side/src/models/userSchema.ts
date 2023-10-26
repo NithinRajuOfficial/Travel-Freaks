@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
+  coverImg: {
+    type: String,
+    required: false,
+  },
   profileImage: {
     type: String,
     required: false,
@@ -34,6 +38,25 @@ const userSchema = new mongoose.Schema({
       },
     },
   ],
+  blockStatus: {
+    type: Boolean,
+    default: false,
+    required: false,
+  },
+  otp: {
+    type: String,
+    required: false,
+  },
+  activityType: {
+    type: String,
+    enum: ["login", "logout"],
+    required: false,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    required: true,
+  },
 });
 
 export const User = mongoose.model("User", userSchema);

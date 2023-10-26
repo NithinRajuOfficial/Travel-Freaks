@@ -19,4 +19,8 @@ export default defineConfig({
     tailwindcss,
     autoprefixer,
   ],
+  server: {
+    host: 'localhost',
+    port: 5174, // Change this to your desired port
+  },
 });

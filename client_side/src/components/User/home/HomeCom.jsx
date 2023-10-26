@@ -11,7 +11,7 @@ export function Home() {
       <HomeCarousel />
       <HomeContent />
       <HomeSubCard />
-      <HomePosts />
+      <HomePosts location={"home"} />
     </>
   );
 }

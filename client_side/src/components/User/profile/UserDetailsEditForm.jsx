@@ -8,18 +8,29 @@ import {
   Typography,
   Textarea,
 } from "@material-tailwind/react";
+// import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { setUser } from "../../../redux/userSlice";
 import { api } from "../../../api/api";
+import { defaultProImg } from "../../../assets/constants";
+import { showError, showSuccess } from "../../../assets/tostify";
 
-export function UserDetailsEditForm({userData,closeModal}) {
+
+export function UserDetailsEditForm({
+  userData,
+  closeModal,
+  onUserDataUpdate,
+}) {
+  const dispatch = useDispatch();
+  // const [updateUserData,setUpdatedUserData] = useState(userData)
   const initialValues = {
-    profileImage: userData? userData.profileImage || "" : "",
-    bio: userData? userData.bio || "" : "",
-    name: userData? userData.name : "",
-    email: userData? userData.email : "",
+    profileImage: userData ? userData.profileImage || "" : "",
+    bio: userData ? userData.bio || "" : "",
+    name: userData ? userData.name : "",
+    email: userData ? userData.email : "",
     oldPassword: "",
     newPassword: "",
   };
-  
 
   const validationSchema = Yup.object({
     profileImage: Yup.mixed()
@@ -27,7 +38,7 @@ export function UserDetailsEditForm({userData,closeModal}) {
         // Check if value is a File object
         if (value instanceof File) {
           // Check if the file size is greater than 1MB (1024 * 1024 bytes)
-          return value.size <= 1024 * 1024;
+          return value.size <= 2024 * 2024;
         }
         // If value is not a File object (e.g., null or empty), consider it valid
         return true;
@@ -46,27 +57,33 @@ export function UserDetailsEditForm({userData,closeModal}) {
       .email("Invalid email address")
       .required("Email is required"),
   });
-  
-  const onSubmit = async(values) => {
-    const formData = new FormData();
-    formData.append("profileImage",values.profileImage)
-    formData.append("bio",values.bio)
-    formData.append("name",values.name)
-    formData.append("email",values.email)
-    formData.append("oldPassword",values.oldPassword)
-    formData.append("newPassword",values.newPassword)
-    console.log("Form submitted with values:", formData);
-    try {
-      const response = await api.patch("user/updateUserDetails",formData)
-      console.log(response,":response...");
-      //closing the modal after response 
-      closeModal()
-    } catch (error) {
-      console.error("Error while updating user details:",error);
-    }
-    
-  }
 
+  const onSubmit = async (values) => {
+    const formData = new FormData();
+    formData.append("profileImage", values.profileImage);
+    formData.append("bio", values.bio);
+    formData.append("name", values.name);
+    formData.append("email", values.email);
+    formData.append("oldPassword", values.oldPassword);
+    formData.append("newPassword", values.newPassword);
+    console.log("Form submitted with values:", formData);
+    
+    try {
+      const response = await api.patch("user/updateUserDetails", formData);
+
+      const updatedUserDeatails = response.data.user;
+
+      dispatch(setUser(updatedUserDeatails));
+
+      onUserDataUpdate(updatedUserDeatails);
+      //closing the modal after response
+      closeModal();
+      showSuccess(`Mr.${updatedUserDeatails.name}, your deatails are updated`)
+    } catch (error) {
+      console.error("Error while updating user details:", error);
+      showError(`Mr.${userData.name}, please retry`)
+    }
+  };
 
   const formik = useFormik({
     initialValues,
@@ -79,15 +96,20 @@ export function UserDetailsEditForm({userData,closeModal}) {
     if (file) {
       // Perform image type and size validation
       if (
-        (file.type.startsWith("image/") && file.size <= 1024 * 1024) ||
+        (file.type.startsWith("image/") && file.size <= 5024 * 5024) ||
         !file.type // Allow empty file
       ) {
         formik.setFieldValue("profileImage", file);
       } else {
-        formik.setFieldValue("profileImage", null);
+        // If validation fails, set to existing profile image or null
+        formik.setFieldValue(
+          "profileImage",
+          userData?.profileImage || null
+        );
       }
     }
   };
+  
 
   return (
     <Card
@@ -118,7 +140,7 @@ export function UserDetailsEditForm({userData,closeModal}) {
                 src={
                   formik.values.profileImage instanceof File
                     ? URL.createObjectURL(formik.values.profileImage)
-                    :userData?.profileImage || "path_to_current_image.jpg"
+                    : userData?.profileImage || defaultProImg 
                 }
                 alt="Profile Image"
                 className="w-32 h-32 rounded-full object-cover"

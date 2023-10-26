@@ -1,4 +1,3 @@
-import { time } from "console";
 import mongoose from "mongoose";
 
 const postSchema = new mongoose.Schema({
@@ -73,6 +72,12 @@ const postSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  likes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+  ],
 });
 
 export const Post = mongoose.model("Post", postSchema);

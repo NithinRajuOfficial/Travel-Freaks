@@ -1,8 +1,14 @@
+import {useState} from "react"
+import {useNavigate} from "react-router-dom"
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { Card, Input, Button, Typography } from "@material-tailwind/react";
+import { api } from "../../api/api";
 
 export function AdminLoginForm() {
+  const navigate = useNavigate()
+  const [error, setError] = useState(null); // for showing the error message from the backend
+
   const formik = useFormik({
     initialValues: {
       userName: "",
@@ -12,8 +18,20 @@ export function AdminLoginForm() {
       userName: Yup.string().required("User Name is required"),
       password: Yup.string().required("Password is required"),
     }),
-    onSubmit: (values) => {
-      console.log("Form submitted with values:", values);
+    onSubmit: async(values) => {
+     try {
+      const response = await api.post("auth/admin/login",values)
+      const {accessToken,refreshToken,admin} = response.data
+      localStorage.setItem("adminAccessToken",accessToken)
+      localStorage.setItem("adminRefreshToken",refreshToken)
+      console.log(accessToken,"accessToken");
+      console.log(admin,"admin");
+      navigate("/admin/dashboard")
+     } catch (error) {
+      console.error("Admin login error:",error);
+      setError("Invalid UserName or Password")
+     }
+      
     },
   });
 
@@ -25,6 +43,7 @@ export function AdminLoginForm() {
       }}
     >
       <Card color="lightBlue" shadow={true} className="w-96 p-8">
+      <small className="text-red-300">{error}</small>
         <Typography
           variant="h4"
           color="blueGray"
@@ -37,7 +56,7 @@ export function AdminLoginForm() {
             <Input
               size="lg"
               label="User Name"
-              name="username"
+              name="userName"
               value={formik.values.userName}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}

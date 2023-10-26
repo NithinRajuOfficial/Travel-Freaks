@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { api } from "./api";
 
 export function usePostFetching() {
+  const postData = useSelector((state) => state.post.data);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [updatedCount, setUpdatedCount] = useState(false);
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         const response = await api.get("user/getAllPosts");
-        console.log(response?.data,'response..........');
         setPosts(response.data.allPosts);
         setLoading(false);
       } catch (error) {
@@ -18,6 +20,6 @@ export function usePostFetching() {
       }
     };
     fetchPosts();
-  }, []);
-  return { posts, loading };
+  }, [postData, updatedCount]);
+  return { posts, loading, updatedCount, setUpdatedCount };
 }

@@ -8,6 +8,11 @@ import { useNavigate } from "react-router-dom";
 import backgroundImage from "../../assets/landing-page-img.jpg";
 
 export function LandingPage() {
+  const [showSignupModal, setShowSignupModal] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const isLoggedIn = useSelector(selectIsLoggedIn);
+  const navigate = useNavigate();
+
   const openSignupModal = () => {
     setShowSignupModal(true);
   };
@@ -40,10 +45,7 @@ export function LandingPage() {
     },
   };
 
-  const [showSignupModal, setShowSignupModal] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const isLoggedIn = useSelector(selectIsLoggedIn);
-  const navigate = useNavigate();
+  
 
   useEffect(() => {
     if (isLoggedIn) {

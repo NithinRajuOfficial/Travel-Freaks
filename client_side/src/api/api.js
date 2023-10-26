@@ -16,13 +16,14 @@
 
 import axios from "axios";
 
+
 export const api = axios.create({
   baseURL: "http://localhost:5500/api/",
 });
 
-export const refreshApi = axios.create({
-  baseURL: "http://localhost:5500/api/",
-});
+// export const refreshApi = axios.create({
+//   baseURL: "http://localhost:5500/api/",
+// });
 
 api.interceptors.request.use((config) => {
   const accessToken = localStorage.getItem("accessToken");
@@ -33,7 +34,6 @@ api.interceptors.request.use((config) => {
 
   // Check if the request data contains an image
   // if (config.data instanceof FormData && config.data.has("image")) {
-  //   console.log(config.data.has("image"),"lllll.....................");
   //   // If the request data is FormData and contains an image, set the "Content-Type" header to "multipart/form-data"
   //   config.headers["Content-Type"] = "multipart/form-data";
   // }
@@ -46,14 +46,13 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     
-    if (error.response.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
+    if (error.response.status === 401 && !error.config?._retry) {
+      error.config._retry = true;
 
       try {
         const refreshToken = localStorage.getItem("refreshToken");
-
         if (refreshToken) {
-          const refreshResponse = await refreshApi.post("/auth/refresh", {
+          const refreshResponse = await api.post("/auth/refresh", {
             refreshToken,
           });
 
@@ -76,7 +75,7 @@ api.interceptors.response.use(
           // Remove tokens from localStorage
           localStorage.removeItem("accessToken");
           localStorage.removeItem("refreshToken");
-
+          location.reload()
           // Redirect to the login page
           // You can use a routing library like react-router-dom for this
           // Example: window.location.href = "/login";

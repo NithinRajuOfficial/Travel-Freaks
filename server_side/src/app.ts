@@ -16,6 +16,8 @@ connectDB();
 // middleware express config
 expressConfig(app);
 
+app.use(express.json());
+
 // For storing user posts
 app.use("/uploads", express.static("server_side/public/uploads"));
 // Routes

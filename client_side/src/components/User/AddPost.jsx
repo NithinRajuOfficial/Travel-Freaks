@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import {
   Card,
   Input,
@@ -8,16 +9,20 @@ import {
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { api } from "../../api/api";
-import { useEffect } from "react";
-
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import {showSuccess, showError} from "../../assets/tostify"
+import { fetchPostStart, fetchPostSuccess, fetchPostFailure } from "../../redux/postSlice";
 // eslint-disable-next-line react/prop-types
-export function PostCreationForm({ onSuccess }) {
-  const initialValues = {
+export function PostCreationForm({ onSuccess, postData,isEdit }) {
+  const dispatch = useDispatch()
+  const [imageSource, setImageSource] = useState("");
+  const initialValues = postData || {
     title: "",
     description: "",
     image: null,
-    startDate: null,
-    endDate: null,
+    startDate: "",
+    endDate: "",
     location: "",
     itinerary: [
       { day: 1, activities: [{ description: "", startTime: "", endTime: "" }] },
@@ -29,11 +34,19 @@ export function PostCreationForm({ onSuccess }) {
   const validationSchema = Yup.object({
     title: Yup.string().required("Title is required"),
     description: Yup.string().required("Description is required"),
-    image: Yup.mixed()
-      .required("Image is required")
-      .test("fileSize", "Image size is too large", (value) => {
-        return value && value.size <= 5000000; // For example, 5MB
-      }),
+    image: Yup.mixed().when('isEdit', (isEdit, schema) => {
+      // If isEditing is true (in edit mode) and a new image is required
+      if (!isEdit) {
+        return schema
+          .required('Image is required')
+          .test('fileSize', 'Image size is too large', (value) => {
+            return value && value.size <= 5000000; // For example, 5MB
+          });
+      }
+      // If not in edit mode or no new image selected, no validation
+      return schema;
+    }),
+    
     startDate: Yup.date().required("Start Date is required"),
     endDate: Yup.date()
       .required("End Date is required")
@@ -79,35 +92,91 @@ export function PostCreationForm({ onSuccess }) {
       formData.append("itinerary", JSON.stringify(values.itinerary));
       formData.append("budget", JSON.stringify(values.budget));
       formData.append("maxNoOfPeoples", values.maxNoOfPeoples);
-
-      try {
-        const response = await api.post("user/addPost", formData);
-        const responseData = response.data;
-        console.log(responseData, "response data...");
-        onSuccess();
-      } catch (error) {
-        console.error("Post Creating error:", error);
-      }
+      isEdit?editPost(formData):addPost(formData)
     },
   });
 
-  useEffect(() => {
-    // Generate itinerary items based on start and end dates
-    if (formik.values.startDate && formik.values.endDate) {
-      const startDate = new Date(formik.values.startDate);
-      const endDate = new Date(formik.values.endDate);
-      const days = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+  async function addPost(formData) {
+    try {
+      dispatch(fetchPostStart())
+      console.log(formData,"=========");
+      const response = await api.post("user/addPost", formData);
+      const createdPostData = response.data;
+      dispatch(fetchPostSuccess(createdPostData))
+      onSuccess();
+      showSuccess("Successfully Created Post")
+    } catch (error) {
+      dispatch(fetchPostFailure(error))
+      console.error("Post Creating error:", error);
+      showError("Post Creating error, please try again")
+    }
+  }
 
-      formik.setFieldValue(
-        "itinerary",
-        Array.from({ length: days }, (_, i) => ({
-          day: i + 1,
-          activities: [{ description: "", startTime: "", endTime: "" }],
-        }))
+  async function editPost(formData) {
+    try {
+      dispatch(fetchPostStart())
+      const response = await api.patch(`user/editPost/${postData._id}`, formData);
+      const updatedPostData = response.data?.post;
+      console.log(updatedPostData,"))))))))))");
+      dispatch(fetchPostSuccess(updatedPostData))
+      onSuccess();
+      showSuccess("Post Edited Successfully")
+    } catch (error) {
+      dispatch(fetchPostFailure(error))
+      console.error("Post Creating error:", error);
+      showError("Editing Post Failed, please try again.")
+    }
+  }
+
+  useEffect(() => {
+    // Generate or update itinerary items based on start and end dates
+    if (formik.values.startDate && formik.values.endDate) {
+      const newStartDate = new Date(formik.values.startDate);
+      const newEndDate = new Date(formik.values.endDate);
+  
+      // Calculate the number of days, including both start and end dates
+      const days = Math.ceil(
+        (newEndDate - newStartDate) / (1000 * 60 * 60 * 24) + 1
       );
+  
+      // Check if the itinerary length needs to be increased
+      if (days > formik.values.itinerary.length) {
+        const currentItinerary = formik.values.itinerary;
+        const newItinerary = Array.from(
+          { length: days },
+          (_, i) => {
+            if (i < currentItinerary.length) {
+              return currentItinerary[i];
+            } else {
+              return {
+                day: i + 1,
+                activities: [{ description: "", startTime: "", endTime: "" }],
+              };
+            }
+          }
+        );
+        formik.setFieldValue("itinerary", newItinerary);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.startDate, formik.values.endDate]);
+  
+
+  // date formatting code
+  function convertDate(inputDate) {
+    // Create a Date object from the input date string
+    const date = new Date(inputDate);
+
+    // Get the year, month, and day components
+    const year = date.getUTCFullYear();
+    const month = (date.getUTCMonth() + 1).toString().padStart(2, "0"); // Add 1 to month (0-indexed) and pad with '0'
+    const day = date.getUTCDate().toString().padStart(2, "0"); // Pad day with '0'
+
+    // Combine the components into the desired format
+    const formattedDate = `${year}-${month}-${day}`;
+
+    return formattedDate;
+  }
 
   return (
     <Card color="transparent" shadow={false}>
@@ -168,7 +237,7 @@ export function PostCreationForm({ onSuccess }) {
               size="lg"
               label="Start Date"
               name="startDate"
-              value={formik.values.startDate || ""}
+              value={convertDate(formik.values.startDate) || ""}
               onChange={(event) => {
                 formik.setFieldValue("startDate", event.target.value);
               }}
@@ -186,7 +255,7 @@ export function PostCreationForm({ onSuccess }) {
               size="lg"
               label="End Date"
               name="endDate"
-              value={formik.values.endDate || ""}
+              value={convertDate(formik.values.endDate) || ""}
               onChange={(event) => {
                 formik.setFieldValue("endDate", event.target.value);
               }}
@@ -203,87 +272,89 @@ export function PostCreationForm({ onSuccess }) {
         {/* Itinerary */}
         {formik.values.itinerary.map((day, index) => (
           <div key={index} className="space-y-4">
-            {day.activities.map((activity, activityIndex) => (
-              <div
-                key={activityIndex}
-                className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4"
-              >
-                <div className="flex-1">
-                  <Input
-                    size="lg"
-                    label={`Day ${day.day} Activity Description`}
-                    name={`itinerary[${index}].activities[${activityIndex}].description`}
-                    value={activity.description}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                  />
-                  {formik.touched.itinerary?.[index]?.activities?.[
-                    activityIndex
-                  ]?.description &&
-                    formik.errors.itinerary?.[index]?.activities?.[
+            {day.activities.map((activity, activityIndex) => {
+              return (
+                <div
+                  key={activityIndex}
+                  className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4"
+                >
+                  <div className="flex-1">
+                    <Input
+                      size="lg"
+                      label={`Day ${day.day} Activity Description`}
+                      name={`itinerary[${index}].activities[${activityIndex}].description`}
+                      value={activity.description}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                    />
+                    {formik.touched.itinerary?.[index]?.activities?.[
                       activityIndex
-                    ]?.description && (
-                      <small className="text-red-500  mt-1">
-                        {
-                          formik.errors.itinerary?.[index]?.activities?.[
-                            activityIndex
-                          ]?.description
-                        }
-                      </small>
-                    )}
-                </div>
-                <div className="flex-.5">
-                  <Input
-                    type="time"
-                    size="lg"
-                    label={`Day ${day.day} Activity Start Time`}
-                    name={`itinerary[${index}].activities[${activityIndex}].startTime`}
-                    value={activity.startTime}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                  />
-                  {formik.touched.itinerary?.[index]?.activities?.[
-                    activityIndex
-                  ]?.startTime &&
-                    formik.errors.itinerary?.[index]?.activities?.[
+                    ]?.description &&
+                      formik.errors.itinerary?.[index]?.activities?.[
+                        activityIndex
+                      ]?.description && (
+                        <small className="text-red-500  mt-1">
+                          {
+                            formik.errors.itinerary?.[index]?.activities?.[
+                              activityIndex
+                            ]?.description
+                          }
+                        </small>
+                      )}
+                  </div>
+                  <div className="flex-.5">
+                    <Input
+                      type="time"
+                      size="lg"
+                      label={`Day ${day.day} Activity Start Time`}
+                      name={`itinerary[${index}].activities[${activityIndex}].startTime`}
+                      value={activity.startTime}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                    />
+                    {formik.touched.itinerary?.[index]?.activities?.[
                       activityIndex
-                    ]?.startTime && (
-                      <small className="text-red-500  mt-1">
-                        {
-                          formik.errors.itinerary?.[index]?.activities?.[
-                            activityIndex
-                          ]?.startTime
-                        }
-                      </small>
-                    )}
-                </div>
-                <div className="flex-.5">
-                  <Input
-                    type="time"
-                    size="lg"
-                    label={`Day ${day.day} Activity End Time`}
-                    name={`itinerary[${index}].activities[${activityIndex}].endTime`}
-                    value={activity.endTime}
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                  />
-                  {formik.touched.itinerary?.[index]?.activities?.[
-                    activityIndex
-                  ]?.endTime &&
-                    formik.errors.itinerary?.[index]?.activities?.[
+                    ]?.startTime &&
+                      formik.errors.itinerary?.[index]?.activities?.[
+                        activityIndex
+                      ]?.startTime && (
+                        <small className="text-red-500  mt-1">
+                          {
+                            formik.errors.itinerary?.[index]?.activities?.[
+                              activityIndex
+                            ]?.startTime
+                          }
+                        </small>
+                      )}
+                  </div>
+                  <div className="flex-.5">
+                    <Input
+                      type="time"
+                      size="lg"
+                      label={`Day ${day.day} Activity End Time`}
+                      name={`itinerary[${index}].activities[${activityIndex}].endTime`}
+                      value={activity.endTime}
+                      onChange={formik.handleChange}
+                      onBlur={formik.handleBlur}
+                    />
+                    {formik.touched.itinerary?.[index]?.activities?.[
                       activityIndex
-                    ]?.endTime && (
-                      <small className="text-red-500  mt-1">
-                        {
-                          formik.errors.itinerary?.[index]?.activities?.[
-                            activityIndex
-                          ]?.endTime
-                        }
-                      </small>
-                    )}
+                    ]?.endTime &&
+                      formik.errors.itinerary?.[index]?.activities?.[
+                        activityIndex
+                      ]?.endTime && (
+                        <small className="text-red-500  mt-1">
+                          {
+                            formik.errors.itinerary?.[index]?.activities?.[
+                              activityIndex
+                            ]?.endTime
+                          }
+                        </small>
+                      )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ))}
 
@@ -349,6 +420,10 @@ export function PostCreationForm({ onSuccess }) {
               name="image"
               onChange={(event) => {
                 formik.setFieldValue("image", event.target.files[0]);
+                const selectedImage = event.target.files[0];
+                if (selectedImage) {
+                  setImageSource(URL.createObjectURL(selectedImage));
+                }
               }}
               onBlur={formik.handleBlur}
             />
@@ -359,7 +434,7 @@ export function PostCreationForm({ onSuccess }) {
             )}
             {formik.values.image && (
               <img
-                src={URL.createObjectURL(formik.values.image)}
+                src={imageSource || (postData ? formik.values.image : "")}
                 alt="Selected Image"
                 className="max-h-36 mt-2"
               />
@@ -368,7 +443,7 @@ export function PostCreationForm({ onSuccess }) {
         </div>
 
         <Button className="mt-4 sm:mt-6 " type="submit">
-          Create Post
+          {isEdit?"Update Post":"Create Post"}
         </Button>
       </form>
     </Card>
