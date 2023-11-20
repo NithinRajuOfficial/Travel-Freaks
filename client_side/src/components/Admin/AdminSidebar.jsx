@@ -5,15 +5,15 @@ import {
     List,
     ListItem,
     ListItemPrefix,
-    ListItemSuffix,
-    Chip,
+    // ListItemSuffix,
+    // Chip,
   } from "@material-tailwind/react";
   import {
     PresentationChartBarIcon,
     ShoppingBagIcon,
-    UserCircleIcon,
-    Cog6ToothIcon,
-    InboxIcon,
+    // UserCircleIcon,
+    // Cog6ToothIcon,
+    // InboxIcon,
     PowerIcon,
   } from "@heroicons/react/24/solid";
   import axios from "axios";
@@ -41,7 +41,7 @@ import {
       <Card className="h-[calc(100vh-2rem)] w-full max-w-[20rem] p-4 shadow-xl shadow-blue-gray-900/5">
         <div className="mb-2 p-4">
           <Typography variant="h5" color="blue-gray">
-            Sidebar
+            Admin Panel
           </Typography>
         </div>
         <List>
@@ -57,7 +57,7 @@ import {
             </ListItemPrefix>
             User Manager Tab
           </ListItem>
-          <ListItem>
+          {/* <ListItem>
             <ListItemPrefix>
               <InboxIcon className="h-5 w-5" />
             </ListItemPrefix>
@@ -77,7 +77,7 @@ import {
               <Cog6ToothIcon className="h-5 w-5" />
             </ListItemPrefix>
             Settings
-          </ListItem>
+          </ListItem> */}
           <ListItem onClick={()=>handleLogout()}>
             <ListItemPrefix>
               <PowerIcon className="h-5 w-5" />

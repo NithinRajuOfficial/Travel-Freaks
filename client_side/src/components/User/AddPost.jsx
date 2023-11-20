@@ -11,11 +11,16 @@ import * as Yup from "yup";
 import { api } from "../../api/api";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import {showSuccess, showError} from "../../assets/tostify"
-import { fetchPostStart, fetchPostSuccess, fetchPostFailure } from "../../redux/postSlice";
+import { showSuccess, showError } from "../../assets/tostify";
+import {
+  fetchPostStart,
+  fetchPostSuccess,
+  fetchPostFailure,
+} from "../../redux/postSlice";
 // eslint-disable-next-line react/prop-types
-export function PostCreationForm({ onSuccess, postData,isEdit }) {
-  const dispatch = useDispatch()
+
+export function PostCreationForm({ onSuccess, postData, isEdit }) {
+  const dispatch = useDispatch();
   const [imageSource, setImageSource] = useState("");
   const initialValues = postData || {
     title: "",
@@ -32,43 +37,84 @@ export function PostCreationForm({ onSuccess, postData,isEdit }) {
   };
 
   const validationSchema = Yup.object({
-    title: Yup.string().required("Title is required"),
-    description: Yup.string().required("Description is required"),
-    image: Yup.mixed().when('isEdit', (isEdit, schema) => {
+    title: Yup.string()
+      .trim()
+      .required("Title is required"),
+    description: Yup.string()
+      .trim()
+      .required("Description is required"),
+    image: Yup.mixed().when("isEdit", (isEdit, schema) => {
       // If isEditing is true (in edit mode) and a new image is required
       if (!isEdit) {
         return schema
-          .required('Image is required')
-          .test('fileSize', 'Image size is too large', (value) => {
+          .required("Image is required")
+          .test("fileSize", "Image size is too large", (value) => {
             return value && value.size <= 5000000; // For example, 5MB
           });
       }
       // If not in edit mode or no new image selected, no validation
       return schema;
     }),
-    
-    startDate: Yup.date().required("Start Date is required"),
+    startDate: Yup.date()
+      .required("Start Date is required")
+      .min(new Date(), "Start Date cannot be a past date"),
     endDate: Yup.date()
       .required("End Date is required")
-      .min(Yup.ref("startDate"), "End Date must be after Start Date"),
-    location: Yup.string().required("Location is required"),
+      .min(Yup.ref("startDate"), "End Date must be after Start Date")
+      .test(
+        "no-past-dates",
+        "End Date cannot be a past date",
+        function (endDate) {
+          const startDate = this.resolve(Yup.ref("startDate"));
+          return startDate <= endDate;
+        }
+      ),
+    location: Yup.string()
+      .trim()
+      .required("Location is required"),
     itinerary: Yup.array().of(
       Yup.object().shape({
         day: Yup.number().required("Day is required"),
         activities: Yup.array().of(
           Yup.object().shape({
-            description: Yup.string().required(
-              "Activity description is required"
-            ),
-            startTime: Yup.string().required("Start Time is required"),
-            endTime: Yup.string().required("End Time is required"),
+            description: Yup.string()
+              .trim()
+              .required("Activity description is required"),
+            startTime: Yup.string()
+              .required("Start Time is required")
+              .test(
+                "no-past-start-time",
+                "Start Time cannot be in the past",
+                function (startTime) {
+                  const currentDate = new Date();
+                  const selectedTime = new Date(
+                    `${currentDate.toDateString()} ${startTime}`
+                  );
+                  return selectedTime >= currentDate;
+                }
+              ),
+            endTime: Yup.string()
+              .required("End Time is required")
+              .test(
+                "no-past-end-time",
+                "End Time cannot be in the past",
+                function (endTime) {
+                  const currentDate = new Date();
+                  const selectedTime = new Date(
+                    `${currentDate.toDateString()} ${endTime}`
+                  );
+                  return selectedTime >= currentDate;
+                }
+              ),
           })
         ),
       })
     ),
     budget: Yup.object().shape({
-      currency: Yup.string().required("Currency is required"),
-      amount: Yup.number().required("Amount is required"),
+      currency: Yup.string()
+        .trim()
+        .required("Currency is required"),
+      amount: Yup.number().required("Amount is required").min(1, "Must be at least 1"),
     }),
     maxNoOfPeoples: Yup.number()
       .required("Maximum Number of People is required")
@@ -92,39 +138,42 @@ export function PostCreationForm({ onSuccess, postData,isEdit }) {
       formData.append("itinerary", JSON.stringify(values.itinerary));
       formData.append("budget", JSON.stringify(values.budget));
       formData.append("maxNoOfPeoples", values.maxNoOfPeoples);
-      isEdit?editPost(formData):addPost(formData)
+      isEdit ? editPost(formData) : addPost(formData);
     },
   });
 
   async function addPost(formData) {
     try {
-      dispatch(fetchPostStart())
-      console.log(formData,"=========");
+      dispatch(fetchPostStart());
+      console.log(formData, "=========");
       const response = await api.post("user/addPost", formData);
       const createdPostData = response.data;
-      dispatch(fetchPostSuccess(createdPostData))
+      dispatch(fetchPostSuccess(createdPostData));
       onSuccess();
-      showSuccess("Successfully Created Post")
+      showSuccess("Successfully Created Post");
     } catch (error) {
-      dispatch(fetchPostFailure(error))
+      dispatch(fetchPostFailure(error));
       console.error("Post Creating error:", error);
-      showError("Post Creating error, please try again")
+      showError("Post Creating error, please try again");
     }
   }
 
   async function editPost(formData) {
     try {
-      dispatch(fetchPostStart())
-      const response = await api.patch(`user/editPost/${postData._id}`, formData);
+      dispatch(fetchPostStart());
+      const response = await api.patch(
+        `user/editPost/${postData._id}`,
+        formData
+      );
       const updatedPostData = response.data?.post;
-      console.log(updatedPostData,"))))))))))");
-      dispatch(fetchPostSuccess(updatedPostData))
+      console.log(updatedPostData, "))))))))))");
+      dispatch(fetchPostSuccess(updatedPostData));
       onSuccess();
-      showSuccess("Post Edited Successfully")
+      showSuccess("Post Edited Successfully");
     } catch (error) {
-      dispatch(fetchPostFailure(error))
+      dispatch(fetchPostFailure(error));
       console.error("Post Creating error:", error);
-      showError("Editing Post Failed, please try again.")
+      showError("Editing Post Failed, please try again.");
     }
   }
 
@@ -133,34 +182,30 @@ export function PostCreationForm({ onSuccess, postData,isEdit }) {
     if (formik.values.startDate && formik.values.endDate) {
       const newStartDate = new Date(formik.values.startDate);
       const newEndDate = new Date(formik.values.endDate);
-  
+
       // Calculate the number of days, including both start and end dates
       const days = Math.ceil(
         (newEndDate - newStartDate) / (1000 * 60 * 60 * 24) + 1
       );
-  
+
       // Check if the itinerary length needs to be increased
       if (days > formik.values.itinerary.length) {
         const currentItinerary = formik.values.itinerary;
-        const newItinerary = Array.from(
-          { length: days },
-          (_, i) => {
-            if (i < currentItinerary.length) {
-              return currentItinerary[i];
-            } else {
-              return {
-                day: i + 1,
-                activities: [{ description: "", startTime: "", endTime: "" }],
-              };
-            }
+        const newItinerary = Array.from({ length: days }, (_, i) => {
+          if (i < currentItinerary.length) {
+            return currentItinerary[i];
+          } else {
+            return {
+              day: i + 1,
+              activities: [{ description: "", startTime: "", endTime: "" }],
+            };
           }
-        );
+        });
         formik.setFieldValue("itinerary", newItinerary);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.startDate, formik.values.endDate]);
-  
 
   // date formatting code
   function convertDate(inputDate) {
@@ -443,7 +488,7 @@ export function PostCreationForm({ onSuccess, postData,isEdit }) {
         </div>
 
         <Button className="mt-4 sm:mt-6 " type="submit">
-          {isEdit?"Update Post":"Create Post"}
+          {isEdit ? "Update Post" : "Create Post"}
         </Button>
       </form>
     </Card>

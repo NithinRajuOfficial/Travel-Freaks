@@ -37,7 +37,6 @@ export function LoginForm({ closeLoginModal, openSignupModal }) {
   const onSubmit = async (values) => {
     try {
       const response = await api.post("auth/login", values);
-      console.log(response,'pppppp');
       if(response.status === 403){
         setError(response.data.error)
       }
@@ -58,7 +57,8 @@ export function LoginForm({ closeLoginModal, openSignupModal }) {
       setError(null);
       dispatch(loginSuccess());
       showSuccess(`Welcome back Mr.${user.name}`)
-      navigate("/home");
+      closeLoginModal()
+      navigate("/");
     } catch (error) {
       if (error.response && error.response.status === 403) {
         setError(error.response.data.error);
@@ -71,7 +71,8 @@ export function LoginForm({ closeLoginModal, openSignupModal }) {
 
   useEffect(() => {
     if (isLoggedIn) {
-      navigate("/home");
+      closeLoginModal()
+      navigate("/");
     }
   }, [isLoggedIn, navigate]);
 
@@ -128,7 +129,7 @@ export function LoginForm({ closeLoginModal, openSignupModal }) {
         setError(null);
         dispatch(loginSuccess());
         showSuccess(`Welcome Mr.${user.name}`)
-        navigate("/home");
+        navigate("/");
       } else if (response.status === 400) {
         console.error(response.data.error);
       } else {
@@ -192,7 +193,6 @@ export function LoginForm({ closeLoginModal, openSignupModal }) {
               href="#"
               className="font-medium text-white"
               onClick={() => {
-                closeLoginModal();
                 openSignupModal();
               }}
             >

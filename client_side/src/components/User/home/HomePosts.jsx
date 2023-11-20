@@ -69,7 +69,7 @@ export function HomePosts({ location, otherUserId }) {
   useEffect(() => {
     const initialLikeStatus = {};
     posts.forEach((post) => {
-      initialLikeStatus[post._id] = post.likes.includes(userData._id);
+      initialLikeStatus[post._id] = post.likes.includes(userData?._id);
     });
     setLikeStatus(initialLikeStatus);
   }, [posts]);
@@ -92,16 +92,16 @@ export function HomePosts({ location, otherUserId }) {
   // by this we can show user post in his profile and non user posts in his home page
   const filteredPosts =
     location === "home"
-      ? posts.filter((post) => post.userId !== userData._id)
+      ? posts.filter((post) => post.userId !== userData?._id)
       : otherUserId
       ? posts.filter((post) => post.userId === otherUserId)
-      : posts.filter((post) => post.userId === userData._id);
+      : posts.filter((post) => post.userId === userData?._id);
   // array for creating the number of skeletons for the posts
   // const skeletonArray = Array(visiblePosts)
   //   .fill()
   //   .map((_, index) => <SkeletonLoading key={index} />);
   return (
-    <div className="m-auto mt-56 flex flex-row flex-wrap justify-center">
+    <div className="m-auto mt-40 flex flex-row flex-wrap justify-center">
       {loading ? (
         <div className="flex flex-row m-24">
           {Array(3)

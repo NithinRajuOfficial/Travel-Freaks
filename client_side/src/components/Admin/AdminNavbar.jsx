@@ -1,6 +1,6 @@
 import {
     Navbar,
-    Avatar,
+    // Avatar,
     Button,
     Input,
   } from "@material-tailwind/react";
@@ -24,7 +24,7 @@ import {
             </Button>
           </div>
           <div className="flex items-center gap-4">
-        <Avatar src="/img/face-2.jpg" alt="avatar" variant="rounded" />
+        {/* <Avatar src="/img/face-2.jpg" alt="avatar" variant="rounded" /> */}
       </div>
           {/* <div className="ml-auto flex gap-1 md:mr-4">
             <IconButton variant="text" color="blue-gray">

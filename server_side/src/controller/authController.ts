@@ -254,6 +254,8 @@ export const authController = {
       if (user) {
         // generating otp
         let otp = generateOTP();
+        console.log(otp,"new otp");
+        
 
         // updating the users document with the generated OTP
         user.otp = otp;
@@ -290,6 +292,8 @@ export const authController = {
   verifyOtp: async (req: Request, res: Response) => {
     try {
       const { otp, email } = req.body;
+      console.log(otp,"otppp ");
+      
 
       //finding the user with that email
       const user = await UserModel.findOne({ email });

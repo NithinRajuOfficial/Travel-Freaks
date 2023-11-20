@@ -165,7 +165,7 @@ export function CoverProfileImageDetails(Id) {
         src={
           otherUsers
             ? otherUsers.coverImg || defaultMainCoverImg
-            : userToDisplay.coverImg || defaultMainCoverImg
+            : userToDisplay?.coverImg || defaultMainCoverImg
         }
         alt="nature image"
       />
@@ -262,7 +262,7 @@ export function CoverProfileImageDetails(Id) {
           src={
             otherUsers
               ? otherUsers.profileImage || defaultProImg
-              : userToDisplay.profileImage || defaultProImg
+              : userToDisplay?.profileImage || defaultProImg
           }
           alt="profile image"
         />
@@ -271,7 +271,7 @@ export function CoverProfileImageDetails(Id) {
           style={{ marginTop: "-40px" }}
         >
           <h1 className="text-3xl inline-block">
-            {otherUsers ? otherUsers.name : userToDisplay.name}
+            {otherUsers ? otherUsers?.name : userToDisplay?.name}
             <span className="ml-5 inline-block cursor-pointer">
               {otherUsers ? (
                 isFollowing ? (
@@ -368,7 +368,7 @@ export function CoverProfileImageDetails(Id) {
           className=" ml-64 text-sm font-mono break-normal"
           style={{ maxWidth: "250px" }}
         >
-          {otherUsers ? otherUsers.bio : userToDisplay.bio}
+          {otherUsers ? otherUsers?.bio : userToDisplay?.bio}
         </Typography>
       </div>
       <Modal

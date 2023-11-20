@@ -21,6 +21,7 @@ export const verifyAccessTokenMiddleware = (
     if (payload.statusCode === 401) {
       return res.status(401).json({ error: "Invalid access token" });
     }
+    
     req.payload = payload;
     next();
 

@@ -29,7 +29,9 @@ export function SignupForm({ closeSignupModal, openLoginModal }) {
   };
 
   const validationSchema = Yup.object({
-    name: Yup.string().required("Name is required"),
+    name: Yup.string()
+    .trim()
+    .required("Name is required"),
     email: Yup.string()
       .email("Invalid email address")
       .required("Email is required"),
@@ -57,7 +59,7 @@ export function SignupForm({ closeSignupModal, openLoginModal }) {
       dispatch(setUser(filteredUserData));
       dispatch(loginSuccess());
       showSuccess(`Welcome Mr.${user.name}`)
-      navigate("/home");
+      navigate("/");
     } catch (error) {
       console.error("Registration error:", error);
       setError("Registeration Error, try again maybe!!!");

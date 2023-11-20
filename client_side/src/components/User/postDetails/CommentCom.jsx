@@ -51,7 +51,7 @@ export function CommentCard() {
     const fetchInitialComments = async () => {
       try {
         const response = await api.get(`user/getComments/${postData._id}`, {
-          params: { skip: currPage * 3, limit: 3 }, // Fetch the initial 3 comments
+          params: { skip: currPage * 3, limit: 3 }, 
         });
         const allComments = response.data.allComments;
         setTotalNoOfComments(response.data.totalNoOfComments);
@@ -104,7 +104,6 @@ export function CommentCard() {
       />
       <Card className="mt-6 w-96">
         <List>
-          {console.log(comments, "coment")}
           {comments.map((comment) => (
             <ListItem key={comment._id} className="hover:cursor-auto">
               <ListItemPrefix>
@@ -119,7 +118,7 @@ export function CommentCard() {
                 <Typography
                   variant="h6"
                   color="blue-gray"
-                  className="w-5 hover:cursor-pointer"
+                  className="w-5 hover:cursor-pointer mr-3"
                   onClick={() => commentedUserProfile(comment?.userId._id)}
                 >
                   {comment?.userId?.name}

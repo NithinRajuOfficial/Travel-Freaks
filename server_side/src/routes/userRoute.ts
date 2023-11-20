@@ -16,7 +16,7 @@ userRoute.post('/addPost',verifyAccessTokenMiddleware,roleCheckMiddleware(ROLE.u
 userRoute.patch("/editPost/:postId",verifyAccessTokenMiddleware,roleCheckMiddleware(ROLE.user),handleFileUpload('image'),userController.updatePost)
 
 // Route for getting all posts
-userRoute.get("/getAllPosts",verifyAccessTokenMiddleware,roleCheckMiddleware(ROLE.user),userController.getAllPosts)
+userRoute.get("/getAllPosts",userController.getAllPosts)
 
 // Route for getting the user details
 userRoute.get('/userDetails/:userId?',verifyAccessTokenMiddleware,roleCheckMiddleware(ROLE.user),userController.getUserDetails)

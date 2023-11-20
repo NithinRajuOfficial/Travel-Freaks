@@ -51,8 +51,12 @@ export function UserDetailsEditForm({
         // If value is not a File object (e.g., null or empty), consider it valid
         return true;
       }),
-    bio: Yup.string().required("Bio is required"),
-    name: Yup.string().required("Name is required"),
+      bio: Yup.string()
+      .required("Bio is required")
+      .trim(),
+    name: Yup.string()
+      .required("Name is required")
+      .trim(),
     email: Yup.string()
       .email("Invalid email address")
       .required("Email is required"),
