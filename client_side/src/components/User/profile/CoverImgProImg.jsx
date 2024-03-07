@@ -5,7 +5,12 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import Modal from "react-modal";
 import { useSelector } from "react-redux";
-import { Breadcrumbs, Typography, Button, Tooltip } from "@material-tailwind/react";
+import {
+  Breadcrumbs,
+  Typography,
+  Button,
+  Tooltip,
+} from "@material-tailwind/react";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../../redux/userSlice";
 import { api } from "../../../api/api";
@@ -16,6 +21,7 @@ import {
   defaultMainCoverImg,
 } from "../../../assets/constants";
 import FollowingModal from "./modalComponets/followingModal";
+import FollowersModal from "./modalComponets/followersModal";
 
 export function CoverProfileImageDetails(Id) {
   const dispatch = useDispatch();
@@ -24,9 +30,10 @@ export function CoverProfileImageDetails(Id) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isImageUploadModalOpen, setIsImageUploadModalOpen] = useState(false);
   const [isFollowingModalOpen, setIsFollowingModalOpen] = useState(false);
+  const [isFollowersModalOpen, setIsFollowersModalOpen] = useState(false);
   const [userData, setUserData] = useState(null);
   const [otherUsers, setOtherUsers] = useState(null);
-  const [isFollowing, setIsFollowing] = useState()
+  const [isFollowing, setIsFollowing] = useState();
   const userToDisplay = Id.userId != undefined ? !userData : user;
   // const { name, bio, profileImage, coverImg } = userToDisplay;
 
@@ -124,7 +131,10 @@ export function CoverProfileImageDetails(Id) {
     setIsFollowingModalOpen(true);
   }
 
- 
+  function handleFollowersModalContents() {
+    setIsFollowersModalOpen(true);
+  }
+
   useEffect(() => {
     // Check if userId is defined
     if (Id.userId != undefined) {
@@ -132,32 +142,37 @@ export function CoverProfileImageDetails(Id) {
         try {
           const response = await api.get(`user/userDetails/${Id.userId}`);
           const userDetails = response.data.userDetails;
-          setIsFollowing(response.data.isFollowing)
+          setIsFollowing(response.data.isFollowing);
           if (userDetails) {
             setOtherUsers(userDetails);
           }
           setIsFollowingModalOpen(false);
+          setIsFollowersModalOpen(false);
         } catch (error) {
           console.error("Error fetching user data:", error);
         }
       }
 
       fetchOtherUsersDetails();
+    } else {
+      setOtherUsers(null);
     }
   }, [Id.userId]);
 
-  // follow and unfollow 
-  const handleFollowAndUnfollow = async() => {
+  // follow and unfollow
+  const handleFollowAndUnfollow = async () => {
     try {
       const userId = otherUsers._id;
-      const response = await api.post(`user/follow&unfollow?userIdToFollow=${userId}`)
-      console.log(response,"response");
-      setIsFollowing(response.data.isFollowing)
+      const response = await api.post(
+        `user/follow&unfollow?userIdToFollow=${userId}`
+      );
+      console.log(response, "response");
+      setIsFollowing(response.data.isFollowing);
     } catch (error) {
-      console.error("Following or Unfollowing action failed:",error);
+      console.error("Following or Unfollowing action failed:", error);
     }
-  }
- 
+  };
+
   return (
     <div className="relative h-auto lg:h-96 w-full">
       <img
@@ -261,7 +276,7 @@ export function CoverProfileImageDetails(Id) {
           className="h-64 w-64 rounded-full object-cover object-center"
           src={
             otherUsers
-              ? otherUsers.profileImage || defaultProImg
+              ? otherUsers?.profileImage || defaultProImg
               : userToDisplay?.profileImage || defaultProImg
           }
           alt="profile image"
@@ -276,60 +291,63 @@ export function CoverProfileImageDetails(Id) {
               {otherUsers ? (
                 isFollowing ? (
                   <Tooltip
-                        content={
-                          <Typography>
-                            <small>UnFollow!.!</small>
-                          </Typography>
-                        }>
-                  <svg
-                  viewBox="0 0 64 64"
-                  fill="currentColor"
-                  height="1em"
-                  width="1em"
-                  onClick={handleFollowAndUnfollow}
-                >
-                  <g
-                    fill="none"
-                    stroke="red"
-                    strokeMiterlimit={10}
-                    strokeWidth={6}
+                    content={
+                      <Typography>
+                        <small>UnFollow!.!</small>
+                      </Typography>
+                    }
                   >
-                    <path d="M18 20h2M46 20h-2M32 47h31V5H1v42h17v12z" />
-                  </g>
-                  <path
-                    fill="none"
-                    stroke="red"
-                    strokeMiterlimit={10}
-                    strokeWidth={6}
-                    d="M40 38a8 8 0 00-16 0"
-                  />
-                </svg>
-                </Tooltip>
-                ):(
+                    <svg
+                      viewBox="0 0 64 64"
+                      fill="currentColor"
+                      height="1em"
+                      width="1em"
+                      onClick={handleFollowAndUnfollow}
+                    >
+                      <g
+                        fill="none"
+                        stroke="red"
+                        strokeMiterlimit={10}
+                        strokeWidth={6}
+                      >
+                        <path d="M18 20h2M46 20h-2M32 47h31V5H1v42h17v12z" />
+                      </g>
+                      <path
+                        fill="none"
+                        stroke="red"
+                        strokeMiterlimit={10}
+                        strokeWidth={6}
+                        d="M40 38a8 8 0 00-16 0"
+                      />
+                    </svg>
+                  </Tooltip>
+                ) : (
                   <Tooltip
-                  content={
-                    <Typography>
-                      <small>Follow!.!</small>
-                    </Typography>
-                  }
-                >
-                  <svg
-                  viewBox="0 0 64 64"
-                  fill="currentColor"
-                  height="1em"
-                  width="1em"
-                  onClick={handleFollowAndUnfollow}
-                >
-                  <g
-                    fill="none"
-                    stroke="green"
-                    strokeMiterlimit={10}
-                    strokeWidth={6}
+                    content={
+                      <Typography>
+                        <small>Follow!.!</small>
+                      </Typography>
+                    }
                   >
-                    <path d="M24 30a8 8 0 0016 0M18 20h2M46 20h-2" />
-                    <path d="M32 47h31V5H1v42h17v12z" />
-                  </g>
-                </svg></Tooltip>)
+                    <svg
+                      viewBox="0 0 64 64"
+                      fill="currentColor"
+                      height="1em"
+                      width="1em"
+                      onClick={handleFollowAndUnfollow}
+                    >
+                      <g
+                        fill="none"
+                        stroke="green"
+                        strokeMiterlimit={10}
+                        strokeWidth={6}
+                      >
+                        <path d="M24 30a8 8 0 0016 0M18 20h2M46 20h-2" />
+                        <path d="M32 47h31V5H1v42h17v12z" />
+                      </g>
+                    </svg>
+                  </Tooltip>
+                )
               ) : (
                 <svg
                   className="w-6 h-6 text-gray-800 dark:text-white"
@@ -345,7 +363,7 @@ export function CoverProfileImageDetails(Id) {
             </span>
           </h1>
 
-          <div className="flex justify-end ">
+          {!otherUsers ? <div className="flex justify-end ">
             <Breadcrumbs className="opacity-100">
               <a
                 href="#"
@@ -356,11 +374,15 @@ export function CoverProfileImageDetails(Id) {
               </a>
             </Breadcrumbs>
             <Breadcrumbs className="w-24 ml-5 opacity-100">
-              <a href="#" className="opacity-100">
+              <a
+                href="#"
+                className="opacity-100"
+                onClick={handleFollowersModalContents}
+              >
                 Followers
               </a>
             </Breadcrumbs>
-          </div>
+          </div> : ""}
         </div>
         <Typography
           variant="lead"
@@ -421,6 +443,10 @@ export function CoverProfileImageDetails(Id) {
       <FollowingModal
         isFollowingModalOpen={isFollowingModalOpen}
         setIsFollowingModalOpen={setIsFollowingModalOpen}
+      />
+      <FollowersModal
+        isFollowersModalOpen={isFollowersModalOpen}
+        setIsFollowersModalOpen={setIsFollowersModalOpen}
       />
     </div>
   );

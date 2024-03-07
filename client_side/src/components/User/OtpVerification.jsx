@@ -13,7 +13,7 @@ const OtpVerificationModal = ({
 }) => {
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
-  const [remainingTime, setRemainingTime] = useState(68)
+  const [remainingTime, setRemainingTime] = useState(68);
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -26,7 +26,7 @@ const OtpVerificationModal = ({
   const handleSubmit = (e) => {
     e.preventDefault();
     if (isVerification) {
-      onSubmit(otp,remainingTime);
+      onSubmit(otp, remainingTime);
     } else {
       onSubmit(email);
     }
@@ -34,23 +34,23 @@ const OtpVerificationModal = ({
 
   // function to decrement the remaining time
   const decrementTime = () => {
-   setRemainingTime((prevRemainingTime) => {
-    if(prevRemainingTime > 0){
-      return prevRemainingTime - 1
-    }
-    return 0
-   })
-  }
-
-  useEffect(()=>{
-    if(isOpen){
-      setRemainingTime(68)
-      const timer = setInterval(decrementTime, 1000)
-      return()=>{
-        clearInterval(timer)
+    setRemainingTime((prevRemainingTime) => {
+      if (prevRemainingTime > 0) {
+        return prevRemainingTime - 1;
       }
+      return 0;
+    });
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      setRemainingTime(68);
+      const timer = setInterval(decrementTime, 1000);
+      return () => {
+        clearInterval(timer);
+      };
     }
-  },[isOpen])
+  }, [isOpen]);
 
   return (
     <Modal
@@ -61,8 +61,8 @@ const OtpVerificationModal = ({
       }
       style={{
         overlay: {
-          backgroundColor: "rgba(0, 0, 0, 0.75)", // Overlay background color
-          zIndex: 1000, // Adjust this value as needed
+          backgroundColor: "rgba(0, 0, 0, 0.75)", 
+          zIndex: 1000, 
         },
         content: {
           position: "absolute",
@@ -76,46 +76,53 @@ const OtpVerificationModal = ({
         },
       }}
     >
-      <Typography variant="h2" className="text-2xl font-semibold mb-4">
-        {isVerification ? " OTP Verification" : "Enter Your Email"}
-      </Typography>
-      <form onSubmit={handleSubmit}>
-        {isVerification ? (
-          <div className="mb-4">
-            <Input
-              type="number"
-              id="otp"
-              label="OTP"
-              name="otp"
-              value={otp}
-              onChange={handleOtpChange}
-              className="w-full border rounded-lg py-2 px-3 text-gray-700 focus:outline-none focus:border-blue-500"
-              required
-              disabled = {remainingTime === 0}
-            />
-            <small>Time Remaining: <span className="text-red-900">{remainingTime} seconds</span></small>
-          </div>
-        ) : (
-          <div className="mb-4">
-            <Input
-              type="email"
-              id="email"
-              label="Email"
-              name="email"
-              value={email}
-              onChange={handleEmailChange}
-              className="w-full border rounded-lg py-2 px-3 text-gray-700 focus:outline-none focus:border-blue-500"
-              required
-            />
-          </div>
-        )}
-        <Button
-          type="submit"
-          className="w-full bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-700 focus:outline-none"
-        >
-          {isVerification ? "Verify OTP" : " Submit Email"}
-        </Button>
-      </form>
+      <div className="flex justify-center items-center flex-col w-full h-full">
+        <Typography variant="h2" className="text-xl font-semibold mb-4">
+          {isVerification ? " OTP Verification" : "Enter Your Email"}
+        </Typography>
+        <form onSubmit={handleSubmit} className="w-full flex flex-col justify-center items-center">
+          {isVerification ? (
+            <div className="mb-4">
+              <Input
+                type="number"
+                id="otp"
+                label="OTP"
+                name="otp"
+                value={otp}
+                onChange={handleOtpChange}
+                className="w-60 border rounded-lg py-2 px-3 text-gray-700 focus:outline-none focus:border-blue-500"
+                required
+                disabled={remainingTime === 0}
+              />
+              <small>
+                Time Remaining:{" "}
+                <span className="text-red-900">{remainingTime} seconds</span>
+              </small>
+            </div>
+          ) : (
+            <div className="mb-4 ">
+              <Input
+                type="email"
+                id="email"
+                label="Email"
+                name="email"
+                value={email}
+                onChange={handleEmailChange}
+                className="w-60 border rounded-lg py-2 px-3 text-gray-700 focus:outline-none focus:border-blue-500"
+                required
+              />
+            </div>
+          )}
+            <Button
+              type="submit"
+              disabled={remainingTime === 0}
+              className=" bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-700 focus:outline-none"
+            >
+              {isVerification ? "Verify OTP" : " Submit Email"}
+              
+            </Button>
+        </form>
+      </div>
     </Modal>
   );
 };

@@ -257,19 +257,23 @@ export const userController = {
       const followingIds = await Following.find({
         userId: loggedInUserId,
       }).distinct("followingId");
-      const allUsersData = await UserModel.find({ _id: { $nin: followingIds } })
+      const allUsersData = await UserModel.find({
+        _id: { $nin: [...followingIds, loggedInUserId] },
+      })
         .skip(skip)
         .limit(pageSize)
         .exec();
+
       const filteredUsersData = allUsersData.filter(
         (user) => user._id.toString() !== loggedInUserId
       );
-      res
-        .status(201)
-        .json({
-          message: "Successfully got all user data:",
-          allUsersData: filteredUsersData,
-        });
+      console.log(filteredUsersData);
+      
+      console.log(filteredUsersData, "filteredUsersData");
+      res.status(201).json({
+        message: "Successfully got all user data:",
+        allUsersData: filteredUsersData,
+      });
 
       if (!allUsersData) {
         res.status(400).json({ error: "Unable to get all users" });
@@ -334,7 +338,6 @@ export const userController = {
       const idOfTheUserToBeFollowed = req.query.userIdToFollow;
 
       const userId = req.payload?.userId;
-
       // Checking id the user is already following the targeted user
       const existingFollowing = await Following.findOne({
         userId,
@@ -366,7 +369,6 @@ export const userController = {
         userId,
         followingId: idOfTheUserToBeFollowed,
       });
-
       // save the following entry
       await followingEntry.save();
 
@@ -390,7 +392,6 @@ export const userController = {
       const followingList = await Following.find({ userId: userId }).populate(
         "followingId"
       );
-      console.log(followingList, "ppp");
 
       res.status(200).json({
         message: "Successfully got users following list",
@@ -399,6 +400,41 @@ export const userController = {
     } catch (error) {
       console.error(
         "Error occurred while fetching users following list:",
+        error
+      );
+      res.status(500).json({ error: "Server Error" });
+    }
+  },
+
+  // to get the followers list of the user
+  getFollowersList: async (req: CustomRequest, res: Response) => {
+    try {
+      const userId = req.payload?.userId;
+
+      const followersList = await Following.find({
+        followingId: userId,
+      }).populate({ path: "userId", select: "name profileImage" });
+      const followingList = await Following.find({ userId: userId }).populate({
+        path: "followingId",
+        select: "name profileImage",
+      });
+
+      let obj: { data: any; isFollowing: boolean }[] = [];
+      followersList.forEach((follower) => {
+        const isFollowing = followingList.some((following) =>
+          following.followingId?.equals(follower?.userId!._id)
+        );
+
+        obj.push({ data: follower.userId, isFollowing });
+      });
+
+      res.status(200).json({
+        message: "Successfully got users followers list",
+        obj,
+      });
+    } catch (error) {
+      console.error(
+        "Error occurred while fetching users followers list:",
         error
       );
       res.status(500).json({ error: "Server Error" });
@@ -424,7 +460,7 @@ export const userController = {
     try {
       const postId = req.params.postId;
       const userId = req.payload?.userId;
-      let currentLikeStatus = false
+      let currentLikeStatus = false;
 
       console.log(userId, "ppp");
 
@@ -453,16 +489,20 @@ export const userController = {
         } else {
           // If the user hasn't liked the post, add the like
           post.likes.push(userIdObject);
-          currentLikeStatus = true
+          currentLikeStatus = true;
         }
       }
 
       // Save the changes to the post
       await post.save();
 
-      const numberOfLikes = post.likes.length      
+      const numberOfLikes = post.likes.length;
 
-      res.status(200).json({ message: "Like/Unlike action successful",currentLikeStatus,numberOfLikes});
+      res.status(200).json({
+        message: "Like/Unlike action successful",
+        currentLikeStatus,
+        numberOfLikes,
+      });
     } catch (error) {
       console.error("Error occurred while like or unlike action:", error);
       res.status(500).json({ error: "Server Error" });

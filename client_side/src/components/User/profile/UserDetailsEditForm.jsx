@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types */
+import { useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import {
@@ -7,6 +8,7 @@ import {
   Button,
   Typography,
   Textarea,
+  Spinner
 } from "@material-tailwind/react";
 // import { useState } from "react";
 import { useDispatch } from "react-redux";
@@ -23,6 +25,7 @@ export function UserDetailsEditForm({
 }) {
   const dispatch = useDispatch();
   // const [updateUserData,setUpdatedUserData] = useState(userData)
+  const [loading,setLoading] = useState(false)
   const initialValues = {
     profileImage: userData ? userData.profileImage || "" : "",
     bio: userData ? userData.bio || "" : "",
@@ -70,11 +73,11 @@ export function UserDetailsEditForm({
     formData.append("email", values.email);
     formData.append("oldPassword", values.oldPassword);
     formData.append("newPassword", values.newPassword);
-    console.log("Form submitted with values:", formData);
     
     try {
+      setLoading(true)
       const response = await api.patch("user/updateUserDetails", formData);
-
+      setLoading(false)
       const updatedUserDeatails = response.data.user;
 
       dispatch(setUser(updatedUserDeatails));
@@ -119,7 +122,7 @@ export function UserDetailsEditForm({
     <Card
       color="transparent"
       shadow={false}
-      className="flex flex-col items-center justify-center"
+      className="flex flex-col items-center justify-center relative"
     >
       <Typography variant="h5" color="blue-gray">
         Update Profile
@@ -137,6 +140,7 @@ export function UserDetailsEditForm({
             name="profileImage"
             onChange={handleImageChange}
             className="hidden"
+            disabled={loading ? true : false}
           />
           <label htmlFor="profileImageInput" className="cursor-pointer">
             <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center">
@@ -169,6 +173,7 @@ export function UserDetailsEditForm({
             value={formik.values.bio}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
+            disabled={loading ? true : false}
           />
           {formik.touched.bio && formik.errors.bio && (
             <small className="text-red-300">{formik.errors.bio}</small>
@@ -185,6 +190,7 @@ export function UserDetailsEditForm({
             value={formik.values.name}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
+            disabled={loading ? true : false}
           />
           {formik.touched.name && formik.errors.name && (
             <small className="text-red-300">{formik.errors.name}</small>
@@ -201,6 +207,7 @@ export function UserDetailsEditForm({
             value={formik.values.email}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
+            disabled={loading ? true : false}
           />
           {formik.touched.email && formik.errors.email && (
             <small className="text-red-300">{formik.errors.email}</small>
@@ -218,6 +225,7 @@ export function UserDetailsEditForm({
             value={formik.values.oldPassword}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
+            disabled={loading ? true : false}
           />
           {formik.touched.oldPassword && formik.errors.oldPassword && (
             <small className="text-red-300">{formik.errors.oldPassword}</small>
@@ -235,6 +243,7 @@ export function UserDetailsEditForm({
             value={formik.values.newPassword}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
+            disabled={loading ? true : false}
           />
           {formik.touched.newPassword && formik.errors.newPassword && (
             <small className="text-red-300">{formik.errors.newPassword}</small>
@@ -242,10 +251,11 @@ export function UserDetailsEditForm({
         </div>
 
         {/* Update Button */}
-        <Button className="mt-3" type="submit">
+        <Button className="mt-3" disabled={loading ? true : false} type="submit">
           Update Profile
         </Button>
       </form>
+      <Spinner className={`h-16 w-16 text-gray-900/50 absolute ${!loading? "hidden" : ""}`} />
     </Card>
   );
 }

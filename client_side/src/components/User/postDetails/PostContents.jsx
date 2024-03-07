@@ -7,11 +7,13 @@ import {
   CardBody,
   Typography,
   List,
-  ListItem,
   Chip,
   Button,
+  Accordion,
+  AccordionHeader,
+  AccordionBody,
 } from "@material-tailwind/react";
-import {api} from '../../../api/api'
+import { api } from "../../../api/api";
 import { showSuccess, showError } from "../../../assets/tostify";
 import { PostCreationForm } from "../AddPost";
 
@@ -19,14 +21,15 @@ export function PostContentCard() {
   // Assuming you have a selector for post and user data
   const postData = useSelector((state) => state.post.data);
   const userData = useSelector((state) => state.user.user);
+  const [open, setOpen] = useState(1);
+  const handleOpen = (value) => setOpen(open === value ? 0 : value);
 
   // creating a state variable to tract edit mode
   const [isEditing, setIsEditing] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // Check if postData is null or undefined, and return null if it is
   if (!postData) {
-
     return <div>loading...........</div>;
   }
 
@@ -37,31 +40,31 @@ export function PostContentCard() {
   };
 
   // checking is the user is authorized to edit the post
-  const isUserAuthorizedToEdit = postData.userId._id === userData._id;
+  const isUserAuthorizedToEdit = postData?.userId?._id === userData?._id;
 
   // to see the profile of the post creator
   const postCreatorProfile = (userId) => {
     try {
-      navigate(`/profile/${userId}`)
+      navigate(`/profile/${userId}`);
     } catch (error) {
-      console.error("Unable to get user details:",error);
+      console.error("Unable to get user details:", error);
     }
-  }
+  };
 
   // function to delete the post
-  const handleDeletePost = async(postId) => {
+  const handleDeletePost = async (postId) => {
     try {
-      const response = await api.delete(`user/deletePost/${postId}`)
-      if(response.status === 200){
-        showSuccess(response.data.message)
-      }else{
-        showError("Unable to delete the Post, please retry.")
+      const response = await api.delete(`user/deletePost/${postId}`);
+      if (response.status === 200) {
+        showSuccess(response.data.message);
+      } else {
+        showError("Unable to delete the Post, please retry.");
       }
-      navigate('/profile')
+      navigate("/profile");
     } catch (error) {
-      console.error("Something went wrong while deleting post:",error);
+      console.error("Something went wrong while deleting post:", error);
     }
-  }
+  };
 
   return (
     <Card className="bg-white rounded-lg shadow-lg mt-6">
@@ -76,12 +79,22 @@ export function PostContentCard() {
           />
         ) : (
           <div>
-            {postData.userId._id !== userData._id ? <div className="flex justify-end">
-            <Avatar src={postData.userId.profileImage} alt="avatar" />
-            <div className="mt-3 ml-2">
-          <Typography variant="h6" className="hover:cursor-pointer" onClick={()=>postCreatorProfile(postData.userId._id)}>{postData.userId.name}</Typography>
-        </div>
-            </div> : <div></div>}
+            {postData.userId._id !== userData._id ? (
+              <div className="flex justify-end">
+                <Avatar src={postData.userId.profileImage} alt="avatar" />
+                <div className="mt-3 ml-2">
+                  <Typography
+                    variant="h6"
+                    className="hover:cursor-pointer"
+                    onClick={() => postCreatorProfile(postData.userId._id)}
+                  >
+                    {postData.userId.name}
+                  </Typography>
+                </div>
+              </div>
+            ) : (
+              <div></div>
+            )}
             <Typography variant="h5" color="blue-gray" className="mb-4">
               {postData.title}
             </Typography>
@@ -137,21 +150,18 @@ export function PostContentCard() {
             </Typography>
             <List className="mt-2">
               {postData && postData.itinerary ? (
-                postData.itinerary.map((item) => (
-                  <ListItem key={item._id}>
-                    <div className="flex justify-start">
-                      <Typography className="flex justify-start">
-                        <Chip
-                          variant="gradient"
-                          value={`Day ${item.day}`}
-                          className="w-16 p-2 mr-5 flex justify-center"
-                        />
-                        {item.activities[0].description} from{" "}
-                        {item.activities[0].startTime} to{" "}
-                        {item.activities[0].endTime}
-                      </Typography>
-                    </div>
-                  </ListItem>
+                postData.itinerary.map((item, i) => (
+                  <Accordion key={item._id} open={open === i + 1} >
+                    <AccordionHeader
+                      onClick={() => handleOpen(i + 1)}
+                      className="text-sm"
+                    >{`Day ${item.day}`}</AccordionHeader>
+                    <AccordionBody className="text-base">
+                      {item.activities[0].description} from{" "}
+                      {item.activities[0].startTime} to{" "}
+                      {item.activities[0].endTime}
+                    </AccordionBody>
+                  </Accordion>
                 ))
               ) : (
                 <p>No itinerary data available</p>
@@ -171,24 +181,23 @@ export function PostContentCard() {
               </Typography>
             </div>
           </div>
-          
         )}
         {isUserAuthorizedToEdit && (
           <div className="flex justify-end">
             {isEditing ? (
               <div>
                 <Button
-                className="mr-2"
-                onClick={() => handleDeletePost(postData._id)}
-              >
-                Delete
-              </Button>
-              <Button
-              className="bg-red-600"
-              onClick={() => setIsEditing(false)}
-            >
-              Cancel
-            </Button>
+                  className="mr-2"
+                  onClick={() => handleDeletePost(postData._id)}
+                >
+                  Delete
+                </Button>
+                <Button
+                  className="bg-red-600"
+                  onClick={() => setIsEditing(false)}
+                >
+                  Cancel
+                </Button>
               </div>
             ) : (
               <Button

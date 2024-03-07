@@ -28,6 +28,8 @@ import {
   PowerIcon,
   ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/solid";
+// import { BsChatSquareText  } from "react-icons/bs";
+import { GiThreeFriends } from "react-icons/gi";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
 import { clearUser } from "../../redux/userSlice";
@@ -35,6 +37,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { defaultProImg } from "../../assets/constants";
 import { api } from "../../api/api";
 import { LoginModal } from "./modals/Login&SignupModal";
+// import ChatListModal from "./chat/SearchUsersModal";
+
 
 export function NavbarDefault() {
   const dispatch = useDispatch();
@@ -50,12 +54,11 @@ export function NavbarDefault() {
   const [openNav, setOpenNav] = React.useState(false);
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = React.useState(false);
-
+  // const [isChatListModalOpen, setIsChatListModalOpen] = React.useState(false);
 
   // Define the logout function
   const handleLogout = async () => {
     try {
-      console.log("came");
       const refreshToken = localStorage.getItem("refreshToken");
 
       // Send a POST request to the logout route with the authorization header
@@ -107,9 +110,15 @@ export function NavbarDefault() {
 
       if (newUsers.length) {
         if (currentPage === 1) {
-          setAllUsers(newUsers);
+          setAllUsers([...new Set(newUsers)]);
         } else {
-          setAllUsers((prevUsers) => [...prevUsers, ...newUsers]);
+          setAllUsers((prevUsers) => {
+            const uniqueUsers = new Map(
+              prevUsers.map((user) => [user._id, user])
+            );
+            newUsers.forEach((user) => uniqueUsers.set(user._id, user));
+            return [...uniqueUsers.values()];
+          });
         }
       } else {
         setAllDataFetched(true);
@@ -141,7 +150,6 @@ export function NavbarDefault() {
   React.useEffect(() => {
     // Attach a scroll event listener
     window.addEventListener("scroll", handleScroll);
-
     // Clean up the event listener on unmount
     return () => {
       window.removeEventListener("scroll", handleScroll);
@@ -154,7 +162,6 @@ export function NavbarDefault() {
       const response = await api.post(
         `user/follow&unfollow?userIdToFollow=${userIdToFollow}`
       );
-      console.log(response.data.isFollowing, "came to frontend");
       // Update the user's follow status in the allUsers array
       const updatedUsers = allUsers.map((user) => {
         if (user._id === userIdToFollow) {
@@ -170,6 +177,10 @@ export function NavbarDefault() {
     }
   };
 
+  // const toggleDrawer = () => {
+  //   setIsChatListModalOpen(true)
+  // };
+
   const navList = (
     <ul className="mb-4 mt-2 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center lg:gap-6">
       <Typography
@@ -178,24 +189,11 @@ export function NavbarDefault() {
         color="blue-gray"
         className="p-1 font-normal"
       >
-        <a
-          href="#"
-          className="flex items-center"
-          onClick={() => navigate("/")}
-        >
-          Home
+        <a href="#" className="flex items-center ">
+        {/* <BsChatSquareText className="text-xl" onClick={toggleDrawer}/> */}
         </a>
       </Typography>
-      <Typography
-        as="li"
-        variant="small"
-        color="blue-gray"
-        className="p-1 font-normal"
-      >
-        <a href="#" className="flex items-center">
-          Trips
-        </a>
-      </Typography>
+     
       <Typography
         as="li"
         variant="small"
@@ -204,7 +202,7 @@ export function NavbarDefault() {
         onClick={getAllUsers}
       >
         <a href="#" className="flex items-center">
-          Find New Travelers
+       < GiThreeFriends  className="text-xl"/>
         </a>
       </Typography>
     </ul>
@@ -212,23 +210,25 @@ export function NavbarDefault() {
 
   // profile menu component
   const profileMenuItems = [
-    userData ? { 
-      label: "My Profile",
-      icon: UserCircleIcon,
-    } : null,
+    userData
+      ? {
+          label: "My Profile",
+          icon: UserCircleIcon,
+        }
+      : null,
 
     // {
     //   label: "Inbox",
     //   icon: InboxArrowDownIcon,
     // },
     {
-      label: userData ? "Sign Out" : "Login",
+      label: userData?.name ? "Sign Out" : "Login",
       icon: userData ? PowerIcon : ArrowRightOnRectangleIcon,
     },
   ];
-
   return (
     <Navbar className="mx-auto max-w-screen-xl py-2 px-4 lg:px-8 lg:py-4">
+      {/* {isChatListModalOpen && <ChatListModal isOpen={isChatListModalOpen} closeChatModal={setIsChatListModalOpen}/> } */}
       <div className="container mx-auto flex items-center justify-between text-blue-gray-900">
         <Typography
           as="a"
@@ -272,75 +272,78 @@ export function NavbarDefault() {
               </Button>
             </MenuHandler>
             <MenuList className="p-1">
-  {profileMenuItems.map((item) => {
-    // Use a ternary operator to conditionally render MenuItem
-    return item ? (
-      <MenuItem
-        key={item.label}
-        onClick={() => {
-          if (item.label === "Sign Out") {
-            handleLogout();
-          } else if (item.label === "My Profile") {
-            navigate("/profile");
-          } else if (item.label === "Login") {
-            setIsLoginModalOpen(true);
-          }
-        }}
-        className={`flex items-center gap-2 rounded ${
-          (userData && item.label === "Sign Out"
-            ? "hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10"
-            : "",
-          !userData && item.label === "Login"
-            ? "hover:bg-blue-500/10 focus:bg-blue-500/10 active:bg-blue-500/10"
-            : "")
-        }`}
-      >
-        {React.createElement(item.icon, {
-          className: `h-4 w-4 ${
-            userData && item.label === "Sign Out" ? "text-red-500" : !userData && item.label === "Login" ? "text-blue-500" : ""
-          }`,
-          strokeWidth: 2,
-        })}
+              {profileMenuItems.map((item) => {
+                // Use a ternary operator to conditionally render MenuItem
+                return item ? (
+                  <MenuItem
+                    key={item.label}
+                    onClick={() => {
+                      if (item.label === "Sign Out") {
+                        handleLogout();
+                      } else if (item.label === "My Profile") {
+                        navigate("/profile");
+                      } else if (item.label === "Login") {
+                        setIsLoginModalOpen(true);
+                      }
+                    }}
+                    className={`flex items-center gap-2 rounded ${
+                      (userData && item.label === "Sign Out"
+                        ? "hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10"
+                        : "",
+                      !userData && item.label === "Login"
+                        ? "hover:bg-blue-500/10 focus:bg-blue-500/10 active:bg-blue-500/10"
+                        : "")
+                    }`}
+                  >
+                    {React.createElement(item.icon, {
+                      className: `h-4 w-4 ${
+                        userData && item.label === "Sign Out"
+                          ? "text-red-500"
+                          : !userData && item.label === "Login"
+                          ? "text-blue-500"
+                          : ""
+                      }`,
+                      strokeWidth: 2,
+                    })}
 
-        <Typography
-          as="span"
-          variant="small"
-          className="font-normal"
-          color={
-            userData && item.label === "Sign Out"
-              ? "red"
-              : !userData && item.label === "Login"
-              ? "blue"
-              : ""
-          }
-        >
-          {item.label}
-        </Typography>
-      </MenuItem>
-    ) : null; // Return null if item is null
-  })}
-</MenuList>;
-
+                    <Typography
+                      as="span"
+                      variant="small"
+                      className="font-normal"
+                      color={
+                        userData && item.label === "Sign Out"
+                          ? "red"
+                          : !userData && item.label === "Login"
+                          ? "blue"
+                          : ""
+                      }
+                    >
+                      {item.label}
+                    </Typography>
+                  </MenuItem>
+                ) : null; // Return null if item is null
+              })}
+            </MenuList>
           </Menu>
           {isLoginModalOpen && (
-        <LoginModal
-          isOpen={isLoginModalOpen}
-          onRequestClose={() => setIsLoginModalOpen(false)}
-          // Additional props for the LoginModal if needed
-        />
-      )}
+            <LoginModal
+              isOpen={isLoginModalOpen}
+              onRequestClose={() => setIsLoginModalOpen(false)}
+              // Additional props for the LoginModal if needed
+            />
+          )}
         </div>
         <Modal
-          className="w-full md:w-2/3 lg:w-1/2 xl:w-1/3 h-full"
+          className="w-full md:w-2/3 lg:w-1/2 xl:w-1/3 h-full "
           isOpen={isModalOpen}
           onRequestClose={closeModal}
-          contentLabel="Edit Cover Image"
           style={{
             overlay: {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               background: "rgba(0,0,0,0.5)",
+              zIndex: "99",
             },
             content: {
               position: "relative",
@@ -363,7 +366,7 @@ export function NavbarDefault() {
         >
           <div ref={modalContentRef} className="flex justify-end">
             <Button
-              className="rounded-full h-8 w-8 flex justify-center items-center "
+              className="rounded-full h-8 w-8 flex justify-center items-center mt-1 "
               onClick={closeModal}
               color="gray"
               style={{ cursor: "pointer" }}
@@ -519,255 +522,3 @@ export function NavbarDefault() {
     </Navbar>
   );
 }
-
-// import React from "react";
-// import {
-//   Navbar,
-//   MobileNav,
-//   Typography,
-//   Button,
-//   Menu,
-//   MenuHandler,
-//   MenuList,
-//   MenuItem,
-//   Avatar,
-//   Card,
-//   IconButton,
-// } from "@material-tailwind/react";
-// import {
-//   CubeTransparentIcon,
-//   UserCircleIcon,
-//   CodeBracketSquareIcon,
-//   Square3Stack3DIcon,
-//   ChevronDownIcon,
-//   Cog6ToothIcon,
-//   InboxArrowDownIcon,
-//   LifebuoyIcon,
-//   PowerIcon,
-//   RocketLaunchIcon,
-//   Bars2Icon,
-// } from "@heroicons/react/24/solid";
-
-// function ProfileMenu() {
-//   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-
-//   const closeMenu = () => setIsMenuOpen(false);
-
-//   return (
-//     <Menu open={isMenuOpen} handler={setIsMenuOpen} placement="bottom-end">
-//       <MenuHandler>
-//         <Button
-//           variant="text"
-//           color="blue-gray"
-//           className="flex items-center gap-1 rounded-full py-0.5 pr-2 pl-0.5 lg:ml-auto"
-//         >
-//           <Avatar
-//             variant="circular"
-//             size="sm"
-//             alt="tania andrew"
-//             className="border border-gray-900 p-0.5"
-//             src=""
-//           />
-//           <ChevronDownIcon
-//             strokeWidth={2.5}
-//             className={`h-3 w-3 transition-transform ${
-//               isMenuOpen ? "rotate-180" : ""
-//             }`}
-//           />
-//         </Button>
-//       </MenuHandler>
-//       <MenuList className="p-1">
-//         {profileMenuItems.map(({ label, icon }, key) => {
-//           const isLastItem = key === profileMenuItems.length - 1;
-//           return (
-//             <MenuItem
-//               key={label}
-//               onClick={closeMenu}
-//               className={`flex items-center gap-2 rounded ${
-//                 isLastItem
-//                   ? "hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10"
-//                   : ""
-//               }`}
-//             >
-//               {React.createElement(icon, {
-//                 className: `h-4 w-4 ${isLastItem ? "text-red-500" : ""}`,
-//                 strokeWidth: 2,
-//               })}
-//               <Typography
-//                 as="span"
-//                 variant="small"
-//                 className="font-normal"
-//                 color={isLastItem ? "red" : "inherit"}
-//               >
-//                 {label}
-//               </Typography>
-//             </MenuItem>
-//           );
-//         })}
-//       </MenuList>
-//     </Menu>
-//   );
-// }
-
-// // nav list menu
-// const navListMenuItems = [
-//   {
-//     title: "@material-tailwind/html",
-//     description:
-//       "Learn how to use @material-tailwind/html, packed with rich components and widgets.",
-//   },
-//   {
-//     title: "@material-tailwind/react",
-//     description:
-//       "Learn how to use @material-tailwind/react, packed with rich components for React.",
-//   },
-//   {
-//     title: "Material Tailwind PRO",
-//     description:
-//       "A complete set of UI Elements for building faster websites in less time.",
-//   },
-// ];
-
-// function NavListMenu() {
-//   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-
-//   const renderItems = navListMenuItems.map(({ title, description }) => (
-//     <a href="#" key={title}>
-//       <MenuItem>
-//         <Typography variant="h6" color="blue-gray" className="mb-1">
-//           {title}
-//         </Typography>
-//         <Typography variant="small" color="gray" className="font-normal">
-//           {description}
-//         </Typography>
-//       </MenuItem>
-//     </a>
-//   ));
-
-//   return (
-//     <React.Fragment>
-//       <Menu allowHover open={isMenuOpen} handler={setIsMenuOpen}>
-//         <MenuHandler>
-//           <Typography as="a" href="#" variant="small" className="font-normal">
-//             <MenuItem className="hidden items-center gap-2 font-medium text-blue-gray-900 lg:flex lg:rounded-full">
-//               <Square3Stack3DIcon className="h-[18px] w-[18px] text-blue-gray-500" />{" "}
-//               Pages{" "}
-//               <ChevronDownIcon
-//                 strokeWidth={2}
-//                 className={`h-3 w-3 transition-transform ${
-//                   isMenuOpen ? "rotate-180" : ""
-//                 }`}
-//               />
-//             </MenuItem>
-//           </Typography>
-//         </MenuHandler>
-//         <MenuList className="hidden w-[36rem] grid-cols-7 gap-3 overflow-visible lg:grid">
-//           <Card
-//             color="blue"
-//             shadow={false}
-//             variant="gradient"
-//             className="col-span-3 grid h-full w-full place-items-center rounded-md"
-//           >
-//             <RocketLaunchIcon strokeWidth={1} className="h-28 w-28" />
-//           </Card>
-//           <ul className="col-span-4 flex w-full flex-col gap-1">
-//             {renderItems}
-//           </ul>
-//         </MenuList>
-//       </Menu>
-//       <MenuItem className="flex items-center gap-2 font-medium text-blue-gray-900 lg:hidden">
-//         <Square3Stack3DIcon className="h-[18px] w-[18px] text-blue-gray-500" />{" "}
-//         Pages{" "}
-//       </MenuItem>
-//       <ul className="ml-6 flex w-full flex-col gap-1 lg:hidden">
-//         {renderItems}
-//       </ul>
-//     </React.Fragment>
-//   );
-// }
-
-// // nav list component
-// const navListItems = [
-//   {
-//     label: "Account",
-//     icon: UserCircleIcon,
-//   },
-//   {
-//     label: "Blocks",
-//     icon: CubeTransparentIcon,
-//   },
-//   {
-//     label: "Docs",
-//     icon: CodeBracketSquareIcon,
-//   },
-// ];
-
-// function NavList() {
-//   return (
-//     <ul className="mt-2 mb-4 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center">
-//       <NavListMenu />
-//       {navListItems.map(({ label, icon }) => (
-//         <Typography
-//           key={label}
-//           as="a"
-//           href="#"
-//           variant="small"
-//           color="gray"
-//           className="font-medium text-blue-gray-500"
-//         >
-//           <MenuItem className="flex items-center gap-2 lg:rounded-full">
-//             {React.createElement(icon, { className: "h-[18px] w-[18px]" })}{" "}
-//             <span className="text-gray-900"> {label}</span>
-//           </MenuItem>
-//         </Typography>
-//       ))}
-//     </ul>
-//   );
-// }
-
-// export function NavbarDefault() {
-//   const [isNavOpen, setIsNavOpen] = React.useState(false);
-
-//   const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur);
-
-//   React.useEffect(() => {
-//     window.addEventListener(
-//       "resize",
-//       () => window.innerWidth >= 960 && setIsNavOpen(false),
-//     );
-//   }, []);
-
-//   return (
-//     <Navbar className="mx-auto max-w-screen-xl p-2 lg:rounded-full lg:pl-6">
-//       <div className="relative mx-auto flex items-center justify-between text-blue-gray-900">
-//         <Typography
-//           as="a"
-//           href="#"
-//           className="mr-4 ml-2 cursor-pointer py-1.5 font-medium"
-//         >
-//           Material Tailwind
-//         </Typography>
-//         <div className="hidden lg:block">
-//           <NavList />
-//         </div>
-//         <IconButton
-//           size="sm"
-//           color="blue-gray"
-//           variant="text"
-//           onClick={toggleIsNavOpen}
-//           className="ml-auto mr-2 lg:hidden"
-//         >
-//           <Bars2Icon className="h-6 w-6" />
-//         </IconButton>
-
-//         <Button size="sm" variant="text">
-//           <span>Log In</span>
-//         </Button>
-//         <ProfileMenu />
-//       </div>
-//       <MobileNav open={isNavOpen} className="overflow-scroll">
-//         <NavList />
-//       </MobileNav>
-//     </Navbar>
-//   );
-// }

@@ -13,6 +13,7 @@ import { ErrorPage } from "./components/ErrorComponent";
 import {AdminLoginForm} from "./components/Admin/AdminLogin"
 import { AdminDashboard } from "./components/Admin/Dashboard";
 import {UserManagementMainComponent} from './components/Admin/userManagement/UserManagementMainCom'
+import ChatComponent from "./components/User/chat/ChatMain";
 
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
         <Route path="/profile/:userId" element={<Profile />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/postDetails" element={<PostDetails />} />
+        <Route path="/chat" element={<ChatComponent/>}/>
 
         {/* Admin Routes starts below here */}
         <Route path="/admin/login" element={<AdminLoginForm />}/>

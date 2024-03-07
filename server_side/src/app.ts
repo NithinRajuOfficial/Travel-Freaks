@@ -1,4 +1,5 @@
 import express, { Application, Request, Response } from "express";
+import { ErrorRequestHandler } from "express";
 import expressConfig from "./config/expressConfig";
 import http from "http";
 import connectDB from "./config/databaseConfig";
@@ -30,6 +31,13 @@ app.use("/api/user", userRoute);
 // Auth Route
 app.use("/api/auth", authRoute);
 
+// Global error handling middleware
+const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  console.error("Main App..ERROR:", err.stack);
+  res.status(500).json({ error: "Something went wrong" });
+};
+
+app.use(errorHandler);
 
 // Server Starting
 serverConfig(server);

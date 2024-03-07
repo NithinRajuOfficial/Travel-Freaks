@@ -162,7 +162,7 @@ export const authController = {
       }
 
       const [Bearer, refreshToken] = refreshTokenHeader.trim().split(" ");
-      
+      console.log(refreshToken,"[[[[[[")
       // Split the header to get the token after "Bearer"
       const { userId } = verifyRefershToken(refreshToken);
 

@@ -7,9 +7,11 @@ import {
   Textarea,
 } from "@material-tailwind/react";
 import { useFormik } from "formik";
-import * as Yup from "yup";
 import { api } from "../../api/api";
 import { useEffect, useState } from "react";
+import { jobFormInputValidations } from "../../assets/validationSchema";
+import { postInputData } from "../../assets/constants";
+import { InputTag, ItineryErrorValidations } from "./input";
 import { useDispatch } from "react-redux";
 import { showSuccess, showError } from "../../assets/tostify";
 import {
@@ -20,6 +22,15 @@ import {
 // eslint-disable-next-line react/prop-types
 
 export function PostCreationForm({ onSuccess, postData, isEdit }) {
+  const {
+    title,
+    startDate,
+    endDate,
+    location,
+    currency,
+    amount,
+    maxNumberOfPeoples,
+  } = postInputData[0];
   const dispatch = useDispatch();
   const [imageSource, setImageSource] = useState("");
   const initialValues = postData || {
@@ -32,94 +43,12 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
     itinerary: [
       { day: 1, activities: [{ description: "", startTime: "", endTime: "" }] },
     ],
-    budget: { currency: "", amount: "" },
+    currency: "",
+    amount: "",
     maxNoOfPeoples: 0,
   };
 
-  const validationSchema = Yup.object({
-    title: Yup.string()
-      .trim()
-      .required("Title is required"),
-    description: Yup.string()
-      .trim()
-      .required("Description is required"),
-    image: Yup.mixed().when("isEdit", (isEdit, schema) => {
-      // If isEditing is true (in edit mode) and a new image is required
-      if (!isEdit) {
-        return schema
-          .required("Image is required")
-          .test("fileSize", "Image size is too large", (value) => {
-            return value && value.size <= 5000000; // For example, 5MB
-          });
-      }
-      // If not in edit mode or no new image selected, no validation
-      return schema;
-    }),
-    startDate: Yup.date()
-      .required("Start Date is required")
-      .min(new Date(), "Start Date cannot be a past date"),
-    endDate: Yup.date()
-      .required("End Date is required")
-      .min(Yup.ref("startDate"), "End Date must be after Start Date")
-      .test(
-        "no-past-dates",
-        "End Date cannot be a past date",
-        function (endDate) {
-          const startDate = this.resolve(Yup.ref("startDate"));
-          return startDate <= endDate;
-        }
-      ),
-    location: Yup.string()
-      .trim()
-      .required("Location is required"),
-    itinerary: Yup.array().of(
-      Yup.object().shape({
-        day: Yup.number().required("Day is required"),
-        activities: Yup.array().of(
-          Yup.object().shape({
-            description: Yup.string()
-              .trim()
-              .required("Activity description is required"),
-            startTime: Yup.string()
-              .required("Start Time is required")
-              .test(
-                "no-past-start-time",
-                "Start Time cannot be in the past",
-                function (startTime) {
-                  const currentDate = new Date();
-                  const selectedTime = new Date(
-                    `${currentDate.toDateString()} ${startTime}`
-                  );
-                  return selectedTime >= currentDate;
-                }
-              ),
-            endTime: Yup.string()
-              .required("End Time is required")
-              .test(
-                "no-past-end-time",
-                "End Time cannot be in the past",
-                function (endTime) {
-                  const currentDate = new Date();
-                  const selectedTime = new Date(
-                    `${currentDate.toDateString()} ${endTime}`
-                  );
-                  return selectedTime >= currentDate;
-                }
-              ),
-          })
-        ),
-      })
-    ),
-    budget: Yup.object().shape({
-      currency: Yup.string()
-        .trim()
-        .required("Currency is required"),
-      amount: Yup.number().required("Amount is required").min(1, "Must be at least 1"),
-    }),
-    maxNoOfPeoples: Yup.number()
-      .required("Maximum Number of People is required")
-      .min(1, "Must be at least 1"),
-  });
+  const validationSchema = jobFormInputValidations;
 
   const formik = useFormik({
     initialValues,
@@ -231,34 +160,10 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
       <form onSubmit={formik.handleSubmit} className="mt-4 space-y-4">
         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
           <div className="flex-1">
-            <Input
-              size="lg"
-              label="Title"
-              name="title"
-              value={formik.values.title}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            />
-            {formik.touched.title && formik.errors.title && (
-              <small className="text-red-500  mt-1">
-                {formik.errors.title}
-              </small>
-            )}
+            <InputTag data={title} formik={formik} />
           </div>
           <div className="flex-1">
-            <Input
-              size="lg"
-              label="Location"
-              name="location"
-              value={formik.values.location}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            />
-            {formik.touched.location && formik.errors.location && (
-              <small className="text-red-500  mt-1">
-                {formik.errors.location}
-              </small>
-            )}
+            <InputTag data={location} formik={formik} />
           </div>
         </div>
 
@@ -277,183 +182,34 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
         )}
         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
           <div className="flex-1">
-            <Input
-              type="date"
-              size="lg"
-              label="Start Date"
-              name="startDate"
-              value={convertDate(formik.values.startDate) || ""}
-              onChange={(event) => {
-                formik.setFieldValue("startDate", event.target.value);
-              }}
-              onBlur={formik.handleBlur}
-            />
-            {formik.touched.startDate && formik.errors.startDate && (
-              <small className="text-red-500  mt-1">
-                {formik.errors.startDate}
-              </small>
-            )}
+            <InputTag data={startDate} formik={formik} />
           </div>
           <div className="flex-1">
-            <Input
-              type="date"
-              size="lg"
-              label="End Date"
-              name="endDate"
-              value={convertDate(formik.values.endDate) || ""}
-              onChange={(event) => {
-                formik.setFieldValue("endDate", event.target.value);
-              }}
-              onBlur={formik.handleBlur}
-            />
-            {formik.touched.endDate && formik.errors.endDate && (
-              <small className="text-red-500  mt-1">
-                {formik.errors.endDate}
-              </small>
-            )}
+            <InputTag data={endDate} formik={formik} />
           </div>
         </div>
 
         {/* Itinerary */}
         {formik.values.itinerary.map((day, index) => (
-          <div key={index} className="space-y-4">
-            {day.activities.map((activity, activityIndex) => {
-              return (
-                <div
-                  key={activityIndex}
-                  className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4"
-                >
-                  <div className="flex-1">
-                    <Input
-                      size="lg"
-                      label={`Day ${day.day} Activity Description`}
-                      name={`itinerary[${index}].activities[${activityIndex}].description`}
-                      value={activity.description}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                    />
-                    {formik.touched.itinerary?.[index]?.activities?.[
-                      activityIndex
-                    ]?.description &&
-                      formik.errors.itinerary?.[index]?.activities?.[
-                        activityIndex
-                      ]?.description && (
-                        <small className="text-red-500  mt-1">
-                          {
-                            formik.errors.itinerary?.[index]?.activities?.[
-                              activityIndex
-                            ]?.description
-                          }
-                        </small>
-                      )}
-                  </div>
-                  <div className="flex-.5">
-                    <Input
-                      type="time"
-                      size="lg"
-                      label={`Day ${day.day} Activity Start Time`}
-                      name={`itinerary[${index}].activities[${activityIndex}].startTime`}
-                      value={activity.startTime}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                    />
-                    {formik.touched.itinerary?.[index]?.activities?.[
-                      activityIndex
-                    ]?.startTime &&
-                      formik.errors.itinerary?.[index]?.activities?.[
-                        activityIndex
-                      ]?.startTime && (
-                        <small className="text-red-500  mt-1">
-                          {
-                            formik.errors.itinerary?.[index]?.activities?.[
-                              activityIndex
-                            ]?.startTime
-                          }
-                        </small>
-                      )}
-                  </div>
-                  <div className="flex-.5">
-                    <Input
-                      type="time"
-                      size="lg"
-                      label={`Day ${day.day} Activity End Time`}
-                      name={`itinerary[${index}].activities[${activityIndex}].endTime`}
-                      value={activity.endTime}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                    />
-                    {formik.touched.itinerary?.[index]?.activities?.[
-                      activityIndex
-                    ]?.endTime &&
-                      formik.errors.itinerary?.[index]?.activities?.[
-                        activityIndex
-                      ]?.endTime && (
-                        <small className="text-red-500  mt-1">
-                          {
-                            formik.errors.itinerary?.[index]?.activities?.[
-                              activityIndex
-                            ]?.endTime
-                          }
-                        </small>
-                      )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <ItineryErrorValidations
+            key={index}
+            day={day}
+            index={index}
+            formik={formik}
+          />
         ))}
 
         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
           <div className="flex-1">
-            <Input
-              size="lg"
-              label="Budget Currency"
-              name="budget.currency"
-              type="text"
-              value={formik.values.budget.currency}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            />
-            {formik.touched.budget?.currency &&
-              formik.errors.budget?.currency && (
-                <small className="text-red-500  mt-1">
-                  {formik.errors.budget.currency}
-                </small>
-              )}
+            <InputTag data={currency} formik={formik} />
           </div>
           <div className="flex-1">
-            <Input
-              size="lg"
-              label="Budget Amount"
-              name="budget.amount"
-              type="number"
-              value={formik.values.budget.amount}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            />
-            {formik.touched.budget?.amount && formik.errors.budget?.amount && (
-              <small className="text-red-500  mt-1">
-                {formik.errors.budget.amount}
-              </small>
-            )}
+            <InputTag data={amount} formik={formik} />
           </div>
         </div>
         <div className="flex justify-between sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
           <div className="w-80">
-            <Input
-              size="lg"
-              label="Max Number of People"
-              name="maxNoOfPeoples"
-              type="number"
-              value={formik.values.maxNoOfPeoples}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            />
-            {formik.touched.maxNoOfPeoples && formik.errors.maxNoOfPeoples && (
-              <small className="text-red-500">
-                {formik.errors.maxNoOfPeoples}
-              </small>
-            )}
+            <InputTag data={maxNumberOfPeoples} formik={formik} />
           </div>
           <div className="w-96">
             {/* <label className="block text-blue-gray-600 text-lg font-semibold">

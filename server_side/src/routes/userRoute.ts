@@ -6,6 +6,7 @@ import roleCheckMiddleware from '../authService/roleCheckMiddleware'
 import { ROLE } from '../config/constants'
 import multer, { Multer } from 'multer';
 import { handleFileUpload } from '../config/multerConfig'
+import { chatController } from '../controller/chatController'
 const userRoute = express.Router()
 
 
@@ -45,6 +46,8 @@ userRoute.post("/follow&unfollow",verifyAccessTokenMiddleware,roleCheckMiddlewar
 // Route to get the following list
 userRoute.get("/following",verifyAccessTokenMiddleware,roleCheckMiddleware(ROLE.user),userController.getFollowingList)
 
+// Route to get all the followers list
+userRoute.get("/followers",verifyAccessTokenMiddleware,roleCheckMiddleware(ROLE.user),userController.getFollowersList)
 // Route to delete a post
 userRoute.delete("/deletePost/:postId",verifyAccessTokenMiddleware,roleCheckMiddleware(ROLE.user),userController.deletePost)
 
@@ -54,4 +57,9 @@ userRoute.delete("/deleteComment/:commentId",verifyAccessTokenMiddleware,roleChe
 // Route to like or unlike a post
 userRoute.post("/likeOrUnlike/:postId",verifyAccessTokenMiddleware,roleCheckMiddleware(ROLE.user),userController.likeOrUnlike)
 
+// Route to search friends
+userRoute.get('/search',verifyAccessTokenMiddleware,roleCheckMiddleware(ROLE.user),chatController.searchUser)
+
+// Route to fetch chats 
+userRoute.get('/accessChats/:userId',verifyAccessTokenMiddleware,roleCheckMiddleware(ROLE.user),chatController.accessChat)
 export default userRoute;

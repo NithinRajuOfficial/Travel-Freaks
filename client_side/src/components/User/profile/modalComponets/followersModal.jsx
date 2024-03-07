@@ -16,28 +16,29 @@ import {
 import { defaultProImg } from "../../../../assets/constants";
 import { api } from "../../../../api/api";
 
-export default function FollowingModal({
-  isFollowingModalOpen,
-  setIsFollowingModalOpen,
+export default function FollowersModal({
+  isFollowersModalOpen,
+  setIsFollowersModalOpen,
 }) {
+  const [followersList, setFollowersList] = React.useState([]);
   const [userFollowStatus, setUserFollowStatus] = React.useState({});
-  const [isFollowingList, setIsFollowingList] = React.useState([]);
-
-  // following modal
-  const handleFollowingModalContents = async () => {
+  const getAllFollowers = async () => {
     try {
-      const response = await api.get("user/following");
-      const followingList = response.data.followingList;
-      const userStatus = {};
-      followingList.forEach((user) => {
-        userStatus[user.followingId._id] = user.isFollowing;
+      const response = await api.get("user/followers");
+      const followersList = response.data?.obj;
+      let userStatus = {};
+      followersList.forEach((follower) => {
+        userStatus[follower.data?._id] = follower.isFollowing;
       });
       setUserFollowStatus(userStatus);
-      setIsFollowingList(followingList);
-      //   setIsFollowingModalOpen(true);
+      setFollowersList(followersList);
     } catch (error) {
-      console.error("Error fetching users following data:", error);
+      console.error("Error happened while fetching followers list:", error);
     }
+  };
+
+  const closeFollowersModal = () => {
+    setIsFollowersModalOpen(!isFollowersModalOpen);
   };
 
   const handleFollowUnfollow = async (userIdToFollow) => {
@@ -45,9 +46,8 @@ export default function FollowingModal({
       const response = await api.post(
         `user/follow&unfollow?userIdToFollow=${userIdToFollow}`
       );
-      setUserFollowStatus((prevState) => {
-        const updatedStatus = { ...prevState };
-        updatedStatus[userIdToFollow] = response.data.toUnfollow;
+      setUserFollowStatus((prev) => {
+        const updatedStatus = { ...prev, [userIdToFollow] : !response.data.toUnfollow };
         return updatedStatus;
       });
     } catch (error) {
@@ -55,20 +55,15 @@ export default function FollowingModal({
     }
   };
 
-  const closeFollowingModal = () => {
-    setIsFollowingModalOpen(!isFollowingModalOpen);
-    setUserFollowStatus({});
-  };
-
   React.useEffect(() => {
-    handleFollowingModalContents();
-  }, [isFollowingModalOpen]);
+    getAllFollowers();
+  }, [isFollowersModalOpen]);
 
   return (
     <Modal
       className="w-full md:w-2/3 lg:w-1/2 xl:w-1/3 h-full"
-      isOpen={isFollowingModalOpen}
-      onRequestClose={closeFollowingModal}
+      isOpen={isFollowersModalOpen}
+      onRequestClose={closeFollowersModal}
       contentLabel="Following Modal"
       style={{
         overlay: {
@@ -99,7 +94,7 @@ export default function FollowingModal({
       <div className="flex justify-end">
         <Button
           className="rounded-full h-8 w-8 flex justify-center items-center "
-          onClick={closeFollowingModal}
+          onClick={closeFollowersModal}
           color="gray"
           style={{ cursor: "pointer" }}
         >
@@ -107,17 +102,17 @@ export default function FollowingModal({
         </Button>
       </div>
       <div className="flex flex-col items-center">
-        <Typography variant="h5">People You&apos;re Following</Typography>
+        <Typography variant="h5">Your Followers</Typography>
         {/* Display a message when there are no users to show */}
-        {isFollowingList.length === 0 ? (
+        {followersList?.length === 0 ? (
           <Typography variant="body" color="blue-gray" className="mt-4">
             No users to display.
           </Typography>
         ) : (
           // Map over the users array and display user data
-          isFollowingList.map((user) => (
+          followersList.map((user) => (
             <Card
-              key={user.followingId._id}
+              key={user?.data?._id}
               className="w-80 h-20 mt-5 shadow-2xl hover:shadow-3xl transition duration-300 ease-in-out transform hover:-translate-y-1"
             >
               <List>
@@ -125,33 +120,36 @@ export default function FollowingModal({
                   <ListItemPrefix>
                     <Avatar
                       variant="circular"
-                      alt={user.followingId.name}
+                      alt={user?.data?.name}
                       src={
-                        user.followingId.profileImage
-                          ? user.followingId.profileImage
+                        user?.data?.profileImage
+                          ? user?.data?.profileImage
                           : defaultProImg
                       } // You can replace this with the user's profile image
                     />
                   </ListItemPrefix>
                   <div className="flex justify-start w-48">
-                    <Link to={`/profile/${user.followingId._id}`} onclick={()=>closeFollowingModal}>
+                    <Link
+                      to={`/profile/${user?.data?._id}`}
+                      onClick={() => closeFollowersModal()}
+                    >
                       <Typography variant="h6" color="blue-gray">
-                        {user.followingId.name}
+                        {user?.data?.name}
                       </Typography>
                     </Link>
                   </div>
                   <span
                     className="flex justify-end hover:cursor-pointer"
-                    onClick={() => handleFollowUnfollow(user.followingId._id)}
+                    onClick={() => handleFollowUnfollow(user?.data?._id)}
                   >
-                    {!userFollowStatus[user.followingId._id] ? (
+                    {userFollowStatus[user.data?._id] ? (
                       <Tooltip
-                        content={
-                          <Typography>
+                      content={
+                        <Typography>
                             <small>UnFollow!.!</small>
                           </Typography>
                         }
-                      >
+                        >
                         <svg
                           viewBox="0 0 64 64"
                           fill="currentColor"
