@@ -1,15 +1,13 @@
 /* eslint-disable react/prop-types */
 import {
   Card,
-  Input,
   Button,
   Typography,
-  Textarea,
 } from "@material-tailwind/react";
 import { useFormik } from "formik";
 import { api } from "../../api/api";
 import { useEffect, useState } from "react";
-import { jobFormInputValidations } from "../../assets/validationSchema";
+import { postFormInputValidations } from "../../assets/validationSchema";
 import { postInputData } from "../../assets/constants";
 import { InputTag, ItineryErrorValidations } from "./input";
 import { useDispatch } from "react-redux";
@@ -22,7 +20,7 @@ import {
 // eslint-disable-next-line react/prop-types
 
 export function PostCreationForm({ onSuccess, postData, isEdit }) {
-  const {
+  const [
     title,
     startDate,
     endDate,
@@ -30,7 +28,8 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
     currency,
     amount,
     maxNumberOfPeoples,
-  } = postInputData[0];
+    description
+   ] = postInputData;
   const dispatch = useDispatch();
   const [imageSource, setImageSource] = useState("");
   const initialValues = postData || {
@@ -48,7 +47,7 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
     maxNoOfPeoples: 0,
   };
 
-  const validationSchema = jobFormInputValidations;
+  const validationSchema = postFormInputValidations;
 
   const formik = useFormik({
     initialValues,
@@ -167,19 +166,7 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
           </div>
         </div>
 
-        <Textarea
-          size="lg"
-          label="Description"
-          name="description"
-          value={formik.values.description}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-        />
-        {formik.touched.description && formik.errors.description && (
-          <small className="text-red-500  mt-1">
-            {formik.errors.description}
-          </small>
-        )}
+        <InputTag data={description} formik={formik} type={"textarea"} />
         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
           <div className="flex-1">
             <InputTag data={startDate} formik={formik} />

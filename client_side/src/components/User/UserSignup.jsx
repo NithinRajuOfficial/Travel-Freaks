@@ -1,15 +1,11 @@
-import {
-  Card,
-  Input,
-  Checkbox,
-  Button,
-  Typography,
-} from "@material-tailwind/react";
+import { Card, Checkbox, Button, Typography } from "@material-tailwind/react";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
-import * as Yup from "yup";
+import { InputTag } from "./input";
+import { signupFormValidationSchema } from "../../assets/validationSchema";
+import { signupInputData } from "../../assets/constants";
 import { api } from "../../api/api";
 import { setUser, loginSuccess } from "../../redux/userSlice";
 import OAuth from "./UserGoogleAuth";
@@ -20,7 +16,7 @@ export function SignupForm({ closeSignupModal, openLoginModal }) {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  const [name, email, password] = signupInputData;
   const initialValues = {
     name: "",
     email: "",
@@ -28,18 +24,7 @@ export function SignupForm({ closeSignupModal, openLoginModal }) {
     agreeTerms: false,
   };
 
-  const validationSchema = Yup.object({
-    name: Yup.string()
-    .trim()
-    .required("Name is required"),
-    email: Yup.string()
-      .email("Invalid email address")
-      .required("Email is required"),
-    password: Yup.string()
-      .min(8, "Password must be at least 8 characters")
-      .required("Password is required"),
-    agreeTerms: Yup.bool().oneOf([true], "You must agree to the terms"),
-  });
+  const validationSchema = signupFormValidationSchema;
 
   const onSubmit = async (values) => {
     try {
@@ -58,7 +43,7 @@ export function SignupForm({ closeSignupModal, openLoginModal }) {
 
       dispatch(setUser(filteredUserData));
       dispatch(loginSuccess());
-      showSuccess(`Welcome Mr.${user.name}`)
+      showSuccess(`Welcome Mr.${user.name}`);
       navigate("/");
     } catch (error) {
       console.error("Registration error:", error);
@@ -73,7 +58,7 @@ export function SignupForm({ closeSignupModal, openLoginModal }) {
   });
 
   return (
-    <div className="flex justify-center items-center h-full rounded-lg bg-gradient-to-br from-blue-500 to-teal-400">
+    <div className="p-6 flex justify-center items-center h-full rounded-lg bg-gradient-to-br from-blue-500 to-teal-400">
       <Card color="transparent" shadow={false} className="w-80 max-w-md">
         <small className="text-red-300">{error}</small>
         <Typography variant="h4" color="blue-gray">
@@ -84,50 +69,16 @@ export function SignupForm({ closeSignupModal, openLoginModal }) {
         </Typography>
         <form className="mt-8 mb-2" onSubmit={formik.handleSubmit}>
           <div className="mb-4 space-y-6">
-            <Input
-              color="white"
-              size="lg"
-              label="Name"
-              name="name"
-              value={formik.values.name}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            />
-            {formik.touched.name && formik.errors.name && (
-              <small className="text-red-300">{formik.errors.name}</small>
-            )}
-            <Input
-              color="white"
-              size="lg"
-              label="Email"
-              name="email"
-              value={formik.values.email}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            />
-            {formik.touched.email && formik.errors.email && (
-              <small className="text-red-300">{formik.errors.email}</small>
-            )}
-            <Input
-              color="white"
-              type="password"
-              size="lg"
-              label="Password"
-              name="password"
-              value={formik.values.password}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            />
-            {formik.touched.password && formik.errors.password && (
-              <small className="text-red-300">{formik.errors.password}</small>
-            )}
+            <InputTag data={name} formik={formik} />
+            <InputTag data={email} formik={formik} />
+            <InputTag data={password} formik={formik} />
           </div>
           <Checkbox
             label={
               <Typography
                 variant="small"
                 color="gray"
-                className="flex items-center font-normal"
+                className="flex items-center font-normal hover:cursor-default"
               >
                 I agree the
                 <a
@@ -146,7 +97,9 @@ export function SignupForm({ closeSignupModal, openLoginModal }) {
           />
           <div>
             {formik.touched.agreeTerms && formik.errors.agreeTerms && (
-              <small className="text-red-300">{formik.errors.agreeTerms}</small>
+              <small className="text-red-300 ">
+                {formik.errors.agreeTerms}
+              </small>
             )}
           </div>
           <Button className="mt-3" fullWidth type="submit">
@@ -162,10 +115,10 @@ export function SignupForm({ closeSignupModal, openLoginModal }) {
                 openLoginModal();
               }}
             >
-              Sign In
+              Login In
             </a>
           </Typography>
-            <OAuth />
+          <OAuth />
         </form>
       </Card>
     </div>

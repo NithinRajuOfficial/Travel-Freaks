@@ -1,6 +1,26 @@
 import * as Yup from "yup";
 
-const jobFormInputValidations = Yup.object({
+const loginFormValidationSchema = Yup.object({
+  email: Yup.string()
+    .email("Invalid Email Address")
+    .required("Email is required"),
+  password: Yup.string()
+    .min(8, "Password must be at least 8 characters")
+    .required("Password is required"),
+});
+
+const signupFormValidationSchema = Yup.object({
+  name: Yup.string().trim().required("Name is required"),
+  email: Yup.string()
+    .email("Invalid email address")
+    .required("Email is required"),
+  password: Yup.string()
+    .min(8, "Password must be at least 8 characters")
+    .required("Password is required"),
+  agreeTerms: Yup.bool().oneOf([true], "You must agree to the terms"),
+});
+
+const postFormInputValidations = Yup.object({
   title: Yup.string().trim().required("Title is required"),
   description: Yup.string().trim().required("Description is required"),
   image: Yup.mixed().when("isEdit", (isEdit, schema) => {
@@ -68,15 +88,19 @@ const jobFormInputValidations = Yup.object({
       ),
     })
   ),
-  
-    currency: Yup.string().trim().required("Currency is required"),
-    amount: Yup.number()
-      .required("Amount is required")
-      .min(1, "Must be at least 1"),
- 
+
+  currency: Yup.string().trim().required("Currency is required"),
+  amount: Yup.number()
+    .required("Amount is required")
+    .min(1, "Must be at least 1"),
+
   maxNoOfPeoples: Yup.number()
     .required("Maximum Number of People is required")
     .min(1, "Must be at least 1"),
 });
 
-export { jobFormInputValidations };
+export {
+  loginFormValidationSchema,
+  signupFormValidationSchema,
+  postFormInputValidations,
+};

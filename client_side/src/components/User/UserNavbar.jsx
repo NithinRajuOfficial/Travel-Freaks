@@ -37,6 +37,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { defaultProImg } from "../../assets/constants";
 import { api } from "../../api/api";
 import { LoginModal } from "./modals/Login&SignupModal";
+import { showSuccess } from "../../assets/tostify";
 // import ChatListModal from "./chat/SearchUsersModal";
 
 
@@ -75,6 +76,7 @@ export function NavbarDefault() {
       dispatch(clearUser());
 
       navigate("/");
+      showSuccess("Logout Success")
     } catch (error) {
       console.error("Logout error:", error);
     }
@@ -329,7 +331,6 @@ export function NavbarDefault() {
             <LoginModal
               isOpen={isLoginModalOpen}
               onRequestClose={() => setIsLoginModalOpen(false)}
-              // Additional props for the LoginModal if needed
             />
           )}
         </div>

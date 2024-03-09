@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Card, Input, Button, Typography } from "@material-tailwind/react";
+import { Card, Button, Typography } from "@material-tailwind/react";
 import { useFormik } from "formik";
-import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
+import { InputTag } from "./input";
+import { loginInputData } from "../../assets/constants";
+import { loginFormValidationSchema } from "../../assets/validationSchema";
 import { api } from "../../api/api";
 import { setUser, loginSuccess, selectIsLoggedIn } from "../../redux/userSlice";
-import { showSuccess,showError } from "../../assets/tostify";
+import { showSuccess, showError } from "../../assets/tostify";
 import OAuth from "./UserGoogleAuth";
 import OtpVerificationModal from "./OtpVerification";
 
@@ -15,35 +17,26 @@ export function LoginForm({ closeLoginModal, openSignupModal }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isLoggedIn = useSelector(selectIsLoggedIn);
+  const [email, password] = loginInputData;
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
   const [error, setError] = useState(null); // for showing the error message from the backend
   const [isVerification, setIsVerification] = useState(false);
   const [isEmail, setIsEmail] = useState("");
-
   const initialValues = {
     email: "",
     password: "",
   };
 
-  const validationSchema = Yup.object({
-    email: Yup.string()
-      .email("Invalid Email Address")
-      .required("Email is required"),
-    password: Yup.string()
-      .min(8, "Password must be at least 8 characters")
-      .required("Password is required"),
-  });
+  const validationSchema = loginFormValidationSchema;
 
   const onSubmit = async (values) => {
     try {
       const response = await api.post("auth/login", values);
-      if(response.status === 403){
-        setError(response.data.error)
+      if (response.status === 403) {
+        setError(response.data.error);
       }
       const { accessToken, refreshToken, user } = response.data;
-      // Store the access token in localStorage
       localStorage.setItem("accessToken", accessToken);
-      // Store the refresh token in localStorage or secure HttpOnly cookie (not recommended for security reasons)
       localStorage.setItem("refreshToken", refreshToken);
 
       const filteredUserData = {
@@ -56,8 +49,8 @@ export function LoginForm({ closeLoginModal, openSignupModal }) {
       dispatch(setUser(filteredUserData));
       setError(null);
       dispatch(loginSuccess());
-      showSuccess(`Welcome back Mr.${user.name}`)
-      closeLoginModal()
+      showSuccess(`Welcome back Mr.${user.name}`);
+      closeLoginModal();
       navigate("/");
     } catch (error) {
       if (error.response && error.response.status === 403) {
@@ -71,7 +64,7 @@ export function LoginForm({ closeLoginModal, openSignupModal }) {
 
   useEffect(() => {
     if (isLoggedIn) {
-      closeLoginModal()
+      closeLoginModal();
       navigate("/");
     }
   }, [isLoggedIn, navigate]);
@@ -91,21 +84,20 @@ export function LoginForm({ closeLoginModal, openSignupModal }) {
   };
 
   const handleEmailSubmit = async (email) => {
-   try {
-    setIsEmail(email);
-    const response = await api.post("auth/sendOtp", { email: email });
-    openOtpModal();
-    console.log(response);
-    setIsVerification(true);
-    showSuccess("Email address is verified")
-    
-   } catch (error) {
-    console.error("Error occurred while verifying email address:",error);
-  showError("Email address isn't recognized") 
-  }
+    try {
+      setIsEmail(email);
+      const response = await api.post("auth/sendOtp", { email: email });
+      openOtpModal();
+      console.log(response);
+      setIsVerification(true);
+      showSuccess("Email address is verified");
+    } catch (error) {
+      console.error("Error occurred while verifying email address:", error);
+      showError("Email address isn't recognized");
+    }
   };
 
-  const handleOtpSubmit = async (otp,remainingTime) => {
+  const handleOtpSubmit = async (otp, remainingTime) => {
     try {
       const response = await api.post("auth/verifyOtp", {
         otp: otp,
@@ -113,7 +105,6 @@ export function LoginForm({ closeLoginModal, openSignupModal }) {
       });
 
       if (response.status === 201) {
-        console.log(response.data);
         const { accessToken, refreshToken, user } = response.data;
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
@@ -128,7 +119,7 @@ export function LoginForm({ closeLoginModal, openSignupModal }) {
         dispatch(setUser(filteredUserData));
         setError(null);
         dispatch(loginSuccess());
-        showSuccess(`Welcome Mr.${user.name}`)
+        showSuccess(`Welcome Mr.${user.name}`);
         navigate("/");
       } else if (response.status === 400) {
         console.error(response.data.error);
@@ -137,16 +128,16 @@ export function LoginForm({ closeLoginModal, openSignupModal }) {
       }
     } catch (error) {
       console.error("Error occurred while verifying OTP:", error);
-      if(remainingTime === 0){
-        showError("Timer has expired, please retry.")
-      }else{
-        showError("Invalid OTP, please retry.")
+      if (remainingTime === 0) {
+        showError("Timer has expired, please retry.");
+      } else {
+        showError("Invalid OTP, please retry.");
       }
     }
   };
 
   return (
-    <div className="flex justify-center items-center rounded-lg h-full bg-gradient-to-br from-blue-500 to-purple-600">
+    <div className="p-6 flex justify-center items-center rounded-lg h-full bg-gradient-to-br from-blue-500 to-purple-600">
       <Card
         color="transparent"
         shadow={false}
@@ -157,33 +148,8 @@ export function LoginForm({ closeLoginModal, openSignupModal }) {
           Welcome Back Traveler!!
         </Typography>
         <form className="space-y-6" onSubmit={formik.handleSubmit}>
-          <Input
-            color="white"
-            size="lg"
-            label="Email"
-            placeholder="Email"
-            name="email"
-            value={formik.values.email}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          />
-          {formik.touched.email && formik.errors.email && (
-            <small className="text-red-300">{formik.errors.email}</small>
-          )}
-          <Input
-            color="white"
-            type="password"
-            size="lg"
-            label="Password"
-            placeholder="Password"
-            name="password"
-            value={formik.values.password}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-          />
-          {formik.touched.password && formik.errors.password && (
-            <small className="text-red-300">{formik.errors.password}</small>
-          )}
+          <InputTag data={email} formik={formik} />
+          <InputTag data={password} formik={formik} />
           <Button className="mt-4" fullWidth type="submit">
             Log In
           </Button>
