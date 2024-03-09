@@ -62,7 +62,7 @@ export function NavbarDefault() {
       const refreshToken = localStorage.getItem("refreshToken");
 
       // Send a POST request to the logout route with the authorization header
-      await axios.post("http://localhost:5500/api/auth/logout", null, {
+      await axios.post("https://travelfreaks.nithin.website/api/auth/logout", null, {
         headers: {
           Authorization: `Bearer ${refreshToken}`,
         },
