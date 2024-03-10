@@ -224,7 +224,7 @@ export function NavbarDefault() {
     //   icon: InboxArrowDownIcon,
     // },
     {
-      label: userData?.name ? "Sign Out" : "Login",
+      label: userData?.isAuthenticated ? "Sign Out" : "Login",
       icon: userData?.name ? PowerIcon : ArrowRightOnRectangleIcon,
     },
   ];
@@ -289,19 +289,19 @@ export function NavbarDefault() {
                       }
                     }}
                     className={`flex items-center gap-2 rounded ${
-                      (userData?.isAuthenticated && item.label === "Sign Out"
+                      (userData && item.label === "Sign Out"
                         ? "hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10"
                         : "",
-                      !userData?.isAuthenticated && item.label === "Login"
+                      !userData && item.label === "Login"
                         ? "hover:bg-blue-500/10 focus:bg-blue-500/10 active:bg-blue-500/10"
                         : "")
                     }`}
                   >
                     {React.createElement(item.icon, {
                       className: `h-4 w-4 ${
-                        userData?.isAuthenticated && item.label === "Sign Out"
+                        userData && item.label === "Sign Out"
                           ? "text-red-500"
-                          : !userData?.isAuthenticated && item.label === "Login"
+                          : !userData && item.label === "Login"
                           ? "text-blue-500"
                           : ""
                       }`,
@@ -313,9 +313,9 @@ export function NavbarDefault() {
                       variant="small"
                       className="font-normal"
                       color={
-                        userData?.isAuthenticated && item.label === "Sign Out"
+                        userData && item.label === "Sign Out"
                           ? "red"
-                          : !userData?.isAuthenticated && item.label === "Login"
+                          : !userData && item.label === "Login"
                           ? "blue"
                           : ""
                       }
@@ -323,7 +323,7 @@ export function NavbarDefault() {
                       {item.label}
                     </Typography>
                   </MenuItem>
-                ) : null; // Return null if item is null
+                ) : null;
               })}
             </MenuList>
           </Menu>
