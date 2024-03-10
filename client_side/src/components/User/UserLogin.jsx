@@ -157,12 +157,13 @@ export function LoginForm({ closeLoginModal, openSignupModal }) {
             Don&apos;t have an account?{" "}
             <a
               href="#"
-              className="font-medium text-white"
+              className="font-medium"
               onClick={() => {
                 openSignupModal();
               }}
             >
-              Sign Up
+              <span className=" text-black transition-colors duration-300 hover:text-white">Sign Up </span>
+              
             </a>
           </Typography>
           <OAuth />

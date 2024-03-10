@@ -18,6 +18,7 @@ export const userController = {
   // adding post
   addPost: async (req: CustomRequest, res: Response) => {
     try {
+      console.log(req.body);
       // Retrieve userId from the custom response header
       const userId = req.payload?.userId;
       // extracting file from the request header
@@ -30,7 +31,8 @@ export const userController = {
         endDate,
         location,
         itinerary,
-        budget,
+        amount,
+        currency,
         maxNoOfPeoples,
       } = req.body;
 
@@ -44,7 +46,7 @@ export const userController = {
         endDate: new Date(endDate),
         location: location,
         itinerary: JSON.parse(itinerary),
-        budget: JSON.parse(budget),
+        budget: { amount, currency },
         maxNoOfPeoples: maxNoOfPeoples,
       });
 
@@ -65,7 +67,6 @@ export const userController = {
     try {
       const file = req.uploadedFile;
       const postId = req.params.postId;
-      const budgetObj = JSON.parse(req.body.budget);
       const itineraryObj = JSON.parse(req.body.itinerary);
 
       const matchedPost = await PostModel.findById(postId);
@@ -100,16 +101,14 @@ export const userController = {
         matchedPost.itinerary = itineraryObj;
       }
 
-      if (budgetObj) {
-        if (
-          budgetObj.currency !== matchedPost.budget?.currency ||
-          budgetObj.amount !== matchedPost.budget?.amount
-        ) {
-          matchedPost.budget = {
-            currency: budgetObj.currency,
-            amount: budgetObj.amount,
-          };
-        }
+      if (
+        req.body.currency !== matchedPost.budget?.currency ||
+        req.body.amount !== matchedPost.budget?.amount
+      ) {
+        matchedPost.budget = {
+          currency: req.body.currency,
+          amount: req.body.amount,
+        };
       }
 
       if (req.body.maxNoOfPeoples !== matchedPost.maxNoOfPeoples) {
@@ -268,7 +267,7 @@ export const userController = {
         (user) => user._id.toString() !== loggedInUserId
       );
       console.log(filteredUsersData);
-      
+
       console.log(filteredUsersData, "filteredUsersData");
       res.status(201).json({
         message: "Successfully got all user data:",

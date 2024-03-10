@@ -1,9 +1,5 @@
 /* eslint-disable react/prop-types */
-import {
-  Card,
-  Button,
-  Typography,
-} from "@material-tailwind/react";
+import { Card, Button, Typography, Spinner } from "@material-tailwind/react";
 import { useFormik } from "formik";
 import { api } from "../../api/api";
 import { useEffect, useState } from "react";
@@ -20,6 +16,7 @@ import {
 // eslint-disable-next-line react/prop-types
 
 export function PostCreationForm({ onSuccess, postData, isEdit }) {
+  const [status, setStatus] = useState(false);
   const [
     title,
     startDate,
@@ -28,8 +25,8 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
     currency,
     amount,
     maxNumberOfPeoples,
-    description
-   ] = postInputData;
+    description,
+  ] = postInputData;
   const dispatch = useDispatch();
   const [imageSource, setImageSource] = useState("");
   const initialValues = postData || {
@@ -53,6 +50,7 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
     initialValues,
     validationSchema,
     onSubmit: async (values) => {
+      console.log(values, "///");
       const formData = new FormData();
       formData.append("title", values.title);
       formData.append("description", values.description);
@@ -64,7 +62,8 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
       formData.append("endDate", endDate.toISOString());
       formData.append("location", values.location);
       formData.append("itinerary", JSON.stringify(values.itinerary));
-      formData.append("budget", JSON.stringify(values.budget));
+      formData.append("amount", JSON.stringify(values.amount));
+      formData.append("currency", values.currency);
       formData.append("maxNoOfPeoples", values.maxNoOfPeoples);
       isEdit ? editPost(formData) : addPost(formData);
     },
@@ -73,14 +72,15 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
   async function addPost(formData) {
     try {
       dispatch(fetchPostStart());
-      console.log(formData, "=========");
+      setStatus(true);
       const response = await api.post("user/addPost", formData);
       const createdPostData = response.data;
       dispatch(fetchPostSuccess(createdPostData));
       onSuccess();
       showSuccess("Successfully Created Post");
+      setStatus(false);
     } catch (error) {
-      dispatch(fetchPostFailure(error));
+      dispatch(fetchPostFailure(error.message));
       console.error("Post Creating error:", error);
       showError("Post Creating error, please try again");
     }
@@ -99,7 +99,7 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
       onSuccess();
       showSuccess("Post Edited Successfully");
     } catch (error) {
-      dispatch(fetchPostFailure(error));
+      dispatch(fetchPostFailure(error.message));
       console.error("Post Creating error:", error);
       showError("Editing Post Failed, please try again.");
     }
@@ -135,44 +135,49 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values.startDate, formik.values.endDate]);
 
-  // date formatting code
-  function convertDate(inputDate) {
-    // Create a Date object from the input date string
-    const date = new Date(inputDate);
+  // // date formatting code
+  // function convertDate(inputDate) {
+  //   // Create a Date object from the input date string
+  //   const date = new Date(inputDate);
 
-    // Get the year, month, and day components
-    const year = date.getUTCFullYear();
-    const month = (date.getUTCMonth() + 1).toString().padStart(2, "0"); // Add 1 to month (0-indexed) and pad with '0'
-    const day = date.getUTCDate().toString().padStart(2, "0"); // Pad day with '0'
+  //   // Get the year, month, and day components
+  //   const year = date.getUTCFullYear();
+  //   const month = (date.getUTCMonth() + 1).toString().padStart(2, "0"); // Add 1 to month (0-indexed) and pad with '0'
+  //   const day = date.getUTCDate().toString().padStart(2, "0"); // Pad day with '0'
 
-    // Combine the components into the desired format
-    const formattedDate = `${year}-${month}-${day}`;
+  //   // Combine the components into the desired format
+  //   const formattedDate = `${year}-${month}-${day}`;
 
-    return formattedDate;
-  }
+  //   return formattedDate;
+  // }
 
   return (
-    <Card color="transparent" shadow={false}>
+    <Card color="transparent" shadow={false} className="relative">
       <Typography variant="h4" color="blue-gray">
         Trip Details
       </Typography>
       <form onSubmit={formik.handleSubmit} className="mt-4 space-y-4">
         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
           <div className="flex-1">
-            <InputTag data={title} formik={formik} />
+            <InputTag data={title} formik={formik} status={status} />
           </div>
           <div className="flex-1">
-            <InputTag data={location} formik={formik} />
+            <InputTag data={location} formik={formik} status={status} />
           </div>
         </div>
 
-        <InputTag data={description} formik={formik} type={"textarea"} />
+        <InputTag
+          data={description}
+          formik={formik}
+          type={"textarea"}
+          status={status}
+        />
         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
           <div className="flex-1">
-            <InputTag data={startDate} formik={formik} />
+            <InputTag data={startDate} formik={formik} status={status} />
           </div>
           <div className="flex-1">
-            <InputTag data={endDate} formik={formik} />
+            <InputTag data={endDate} formik={formik} status={status} />
           </div>
         </div>
 
@@ -183,20 +188,25 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
             day={day}
             index={index}
             formik={formik}
+            status={status}
           />
         ))}
 
         <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
           <div className="flex-1">
-            <InputTag data={currency} formik={formik} />
+            <InputTag data={currency} formik={formik} status={status} />
           </div>
           <div className="flex-1">
-            <InputTag data={amount} formik={formik} />
+            <InputTag data={amount} formik={formik} status={status} />
           </div>
         </div>
         <div className="flex justify-between sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
           <div className="w-80">
-            <InputTag data={maxNumberOfPeoples} formik={formik} />
+            <InputTag
+              data={maxNumberOfPeoples}
+              formik={formik}
+              status={status}
+            />
           </div>
           <div className="w-96">
             {/* <label className="block text-blue-gray-600 text-lg font-semibold">
@@ -206,6 +216,7 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
               type="file"
               accept="image/*"
               name="image"
+              disabled={status ? status : false}
               onChange={(event) => {
                 formik.setFieldValue("image", event.target.files[0]);
                 const selectedImage = event.target.files[0];
@@ -230,10 +241,19 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
           </div>
         </div>
 
-        <Button className="mt-4 sm:mt-6 " type="submit">
+        <Button
+          className="mt-4 sm:mt-6 "
+          type="submit"
+          disabled={status ? status : false}
+        >
           {isEdit ? "Update Post" : "Create Post"}
         </Button>
       </form>
+      <Spinner color="indigo"
+        className={`h-16 w-16 text-gray-900/50  absolute top-1/2 left-1/2 ${
+          !status ? "hidden" : ""
+        }`}
+      />
     </Card>
   );
 }

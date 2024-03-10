@@ -23,12 +23,13 @@ exports.userController = {
     addPost: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
         try {
+            console.log(req.body);
             // Retrieve userId from the custom response header
             const userId = (_a = req.payload) === null || _a === void 0 ? void 0 : _a.userId;
             // extracting file from the request header
             const file = req.uploadedFile;
             // Extracting post data from the request
-            const { title, description, startDate, endDate, location, itinerary, budget, maxNoOfPeoples, } = req.body;
+            const { title, description, startDate, endDate, location, itinerary, amount, currency, maxNoOfPeoples, } = req.body;
             // Creating a new post
             const newPost = new postSchema_1.Post({
                 userId: userId,
@@ -39,7 +40,7 @@ exports.userController = {
                 endDate: new Date(endDate),
                 location: location,
                 itinerary: JSON.parse(itinerary),
-                budget: JSON.parse(budget),
+                budget: { amount, currency },
                 maxNoOfPeoples: maxNoOfPeoples,
             });
             // Save the new post
@@ -60,7 +61,6 @@ exports.userController = {
         try {
             const file = req.uploadedFile;
             const postId = req.params.postId;
-            const budgetObj = JSON.parse(req.body.budget);
             const itineraryObj = JSON.parse(req.body.itinerary);
             const matchedPost = yield postSchema_1.Post.findById(postId);
             if (!matchedPost) {
@@ -86,14 +86,12 @@ exports.userController = {
             if (itineraryObj && Array.isArray(itineraryObj)) {
                 matchedPost.itinerary = itineraryObj;
             }
-            if (budgetObj) {
-                if (budgetObj.currency !== ((_b = matchedPost.budget) === null || _b === void 0 ? void 0 : _b.currency) ||
-                    budgetObj.amount !== ((_c = matchedPost.budget) === null || _c === void 0 ? void 0 : _c.amount)) {
-                    matchedPost.budget = {
-                        currency: budgetObj.currency,
-                        amount: budgetObj.amount,
-                    };
-                }
+            if (req.body.currency !== ((_b = matchedPost.budget) === null || _b === void 0 ? void 0 : _b.currency) ||
+                req.body.amount !== ((_c = matchedPost.budget) === null || _c === void 0 ? void 0 : _c.amount)) {
+                matchedPost.budget = {
+                    currency: req.body.currency,
+                    amount: req.body.amount,
+                };
             }
             if (req.body.maxNoOfPeoples !== matchedPost.maxNoOfPeoples) {
                 matchedPost.maxNoOfPeoples = req.body.maxNoOfPeoples;

@@ -2,8 +2,11 @@ import { Button, Avatar, Typography  } from "@material-tailwind/react";
 import { useState } from "react";
 import Modal from "react-modal";
 import { PostCreationForm } from "../AddPost";
+import { useSelector } from "react-redux";
 
 export function HomeContent() {
+  const user = useSelector(state => state.user)
+  console.log(user,"[[[")
   // const modalStyles = {
   //   content: {
   //     width: "500px",
@@ -105,11 +108,11 @@ export function HomeContent() {
       Capture the moments that take your breath away. 🌄❤️
       </Typography>
     </div>
-    <div className="flex items-center">
+    {user.isAuthenticated && <div className="flex items-center">
       <Button className="h-12 capitalize"  onClick={openModal}>
         Plan your Trip!.
       </Button>
-      </div>
+      </div>}
       <Modal
         isOpen={isModalOpen}
         onRequestClose={closeModal}

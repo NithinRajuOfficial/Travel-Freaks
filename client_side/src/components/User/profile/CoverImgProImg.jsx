@@ -84,7 +84,7 @@ export function CoverProfileImageDetails(Id) {
   };
 
   const closeImageUploadModal = () => {
-    setIsImageUploadModalOpen(false); // Close the image upload modal
+    setIsImageUploadModalOpen(false);
   };
 
   const handleCoverImgEdit = () => {
@@ -185,214 +185,221 @@ export function CoverProfileImageDetails(Id) {
         alt="nature image"
       />
 
-      <div className="absolute inset-0 top-52 left-20 flex flex-wrap items-end">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="1.5"
-          stroke="currentColor"
-          className="w-8 h-8 absolute cursor-pointer right-1 text-green-600"
-          onClick={handleCoverImgEdit}
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-          />
-        </svg>
-
-        <Modal
-          className="w-full md:w-2/3 lg:w-1/2 xl:w-1/3 h-full"
-          isOpen={isImageUploadModalOpen}
-          onRequestClose={closeImageUploadModal}
-          contentLabel="Edit Cover Image"
-          style={{
-            overlay: {
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "rgba(0,0,0,0.5)",
-            },
-            content: {
-              position: "relative",
-              top: "auto",
-              left: "auto",
-              right: "auto",
-              bottom: "auto",
-              border: "none",
-              background: "whitesmoke",
-              overflow: "hidden",
-              WebkitOverflowScrolling: "touch",
-              borderRadius: "4px",
-              outline: "none",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // Add shadow
-              height: "80vh",
-              minWidth: "300px",
-              maxWidth: "80%",
-            },
-          }}
-        >
-          <div className="flex justify-end">
-            <Button
-              className="rounded-full h-8 w-8 flex justify-center items-center "
-              onClick={closeImageUploadModal}
-              color="gray"
-              style={{ cursor: "pointer" }}
-            >
-              X
-            </Button>
-          </div>
-          <form
-            className="p-4 md:p-10 flex flex-col items-center"
-            onSubmit={formik.handleSubmit}
+      {user && (
+        <div className="absolute inset-0 top-52 left-20 flex flex-wrap items-end">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="w-8 h-8 absolute cursor-pointer right-1 text-green-600"
+            onClick={handleCoverImgEdit}
           >
-            <input
-              type="file"
-              name="coverImg"
-              accept="image/*"
-              className="ml-20"
-              onChange={handleImageChange}
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
             />
+          </svg>
 
-            <img
-              src={
-                formik.values.coverImg instanceof File
-                  ? URL.createObjectURL(formik.values.coverImg)
-                  : userData?.coverImg || defaultCoverImg
-              }
-              alt="Cover image"
-            />
-            <button
-              type="submit"
-              className=" mt-6 w-80 bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600 transition duration-300"
+          <Modal
+            className="w-full md:w-2/3 lg:w-1/2 xl:w-1/3 h-full p-2"
+            isOpen={isImageUploadModalOpen}
+            onRequestClose={closeImageUploadModal}
+            contentLabel="Edit Cover Image"
+            style={{
+              overlay: {
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "rgba(0,0,0,0.5)",
+              },
+              content: {
+                position: "relative",
+                top: "auto",
+                left: "auto",
+                right: "auto",
+                bottom: "auto",
+                border: "none",
+                background: "whitesmoke",
+                overflow: "hidden",
+                WebkitOverflowScrolling: "touch",
+                borderRadius: "4px",
+                outline: "none",
+                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                height: "80vh",
+                minWidth: "300px",
+                maxWidth: "80%",
+              },
+            }}
+          >
+            <div className="flex justify-end">
+              <Button
+                className="rounded-full h-8 w-8 flex justify-center items-center "
+                onClick={closeImageUploadModal}
+                color="gray"
+                style={{ cursor: "pointer" }}
+              >
+                X
+              </Button>
+            </div>
+            <form
+              className="p-4 md:p-10 flex flex-col items-center"
+              onSubmit={formik.handleSubmit}
             >
-              Upload Image
-            </button>
-          </form>
-        </Modal>
+              <input
+                type="file"
+                name="coverImg"
+                accept="image/*"
+                className="ml-36"
+                onChange={handleImageChange}
+              />
 
-        <img
-          className="h-64 w-64 rounded-full object-cover object-center"
-          src={
-            otherUsers
-              ? otherUsers?.profileImage || defaultProImg
-              : userToDisplay?.profileImage || defaultProImg
-          }
-          alt="profile image"
-        />
-        <div
-          className="ml-64 w-full flex justify-between"
-          style={{ marginTop: "-40px" }}
-        >
-          <h1 className="text-3xl inline-block">
-            {otherUsers ? otherUsers?.name : userToDisplay?.name}
-            <span className="ml-5 inline-block cursor-pointer">
-              {otherUsers ? (
-                isFollowing ? (
-                  <Tooltip
-                    content={
-                      <Typography>
-                        <small>UnFollow!.!</small>
-                      </Typography>
-                    }
-                  >
-                    <svg
-                      viewBox="0 0 64 64"
-                      fill="currentColor"
-                      height="1em"
-                      width="1em"
-                      onClick={handleFollowAndUnfollow}
+              <img
+                className="mt-6 object-cover w-[80%] h-96"
+                src={
+                  formik.values.coverImg instanceof File
+                    ? URL.createObjectURL(formik.values.coverImg)
+                    : userData?.coverImg || defaultCoverImg
+                }
+                alt="Cover image"
+              />
+              <button
+                type="submit"
+                className=" mt-6 w-40 bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600 hover:font-semibold transition duration-300"
+              >
+                Upload Image
+              </button>
+            </form>
+          </Modal>
+
+          <img
+            className="h-64 w-64 rounded-full object-cover object-center"
+            src={
+              otherUsers
+                ? otherUsers?.profileImage || defaultProImg
+                : userToDisplay?.profileImage || defaultProImg
+            }
+            alt="profile image"
+          />
+          <div
+            className="ml-64 w-full flex justify-between"
+            style={{ marginTop: "-40px" }}
+          >
+            <h1 className="text-3xl inline-block">
+              {otherUsers ? otherUsers?.name : userToDisplay?.name}
+              <span className="ml-5 inline-block cursor-pointer">
+                {otherUsers ? (
+                  isFollowing ? (
+                    <Tooltip
+                      content={
+                        <Typography>
+                          <small>UnFollow!.!</small>
+                        </Typography>
+                      }
                     >
-                      <g
-                        fill="none"
-                        stroke="red"
-                        strokeMiterlimit={10}
-                        strokeWidth={6}
+                      <svg
+                        viewBox="0 0 64 64"
+                        fill="currentColor"
+                        height="1em"
+                        width="1em"
+                        onClick={handleFollowAndUnfollow}
                       >
-                        <path d="M18 20h2M46 20h-2M32 47h31V5H1v42h17v12z" />
-                      </g>
-                      <path
-                        fill="none"
-                        stroke="red"
-                        strokeMiterlimit={10}
-                        strokeWidth={6}
-                        d="M40 38a8 8 0 00-16 0"
-                      />
-                    </svg>
-                  </Tooltip>
+                        <g
+                          fill="none"
+                          stroke="red"
+                          strokeMiterlimit={10}
+                          strokeWidth={6}
+                        >
+                          <path d="M18 20h2M46 20h-2M32 47h31V5H1v42h17v12z" />
+                        </g>
+                        <path
+                          fill="none"
+                          stroke="red"
+                          strokeMiterlimit={10}
+                          strokeWidth={6}
+                          d="M40 38a8 8 0 00-16 0"
+                        />
+                      </svg>
+                    </Tooltip>
+                  ) : (
+                    <Tooltip
+                      content={
+                        <Typography>
+                          <small>Follow!.!</small>
+                        </Typography>
+                      }
+                    >
+                      <svg
+                        viewBox="0 0 64 64"
+                        fill="currentColor"
+                        height="1em"
+                        width="1em"
+                        onClick={handleFollowAndUnfollow}
+                      >
+                        <g
+                          fill="none"
+                          stroke="green"
+                          strokeMiterlimit={10}
+                          strokeWidth={6}
+                        >
+                          <path d="M24 30a8 8 0 0016 0M18 20h2M46 20h-2" />
+                          <path d="M32 47h31V5H1v42h17v12z" />
+                        </g>
+                      </svg>
+                    </Tooltip>
+                  )
                 ) : (
-                  <Tooltip
-                    content={
-                      <Typography>
-                        <small>Follow!.!</small>
-                      </Typography>
-                    }
+                  <svg
+                    className="w-6 h-6 text-gray-800 dark:text-white"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="currentColor"
+                    viewBox="0 0 20 18"
+                    onClick={handleEditClick}
                   >
-                    <svg
-                      viewBox="0 0 64 64"
-                      fill="currentColor"
-                      height="1em"
-                      width="1em"
-                      onClick={handleFollowAndUnfollow}
-                    >
-                      <g
-                        fill="none"
-                        stroke="green"
-                        strokeMiterlimit={10}
-                        strokeWidth={6}
-                      >
-                        <path d="M24 30a8 8 0 0016 0M18 20h2M46 20h-2" />
-                        <path d="M32 47h31V5H1v42h17v12z" />
-                      </g>
-                    </svg>
-                  </Tooltip>
-                )
-              ) : (
-                <svg
-                  className="w-6 h-6 text-gray-800 dark:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="currentColor"
-                  viewBox="0 0 20 18"
-                  onClick={handleEditClick}
-                >
-                  <path d="M6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm-1.391 7.361.707-3.535a3 3 0 0 1 .82-1.533L7.929 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h4.259a2.975 2.975 0 0 1-.15-1.639ZM8.05 17.95a1 1 0 0 1-.981-1.2l.708-3.536a1 1 0 0 1 .274-.511l6.363-6.364a3.007 3.007 0 0 1 4.243 0 3.007 3.007 0 0 1 0 4.243l-6.365 6.363a1 1 0 0 1-.511.274l-3.536.708a1.07 1.07 0 0 1-.195.023Z" />
-                </svg>
-              )}
-            </span>
-          </h1>
+                    <path d="M6.5 9a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9Zm-1.391 7.361.707-3.535a3 3 0 0 1 .82-1.533L7.929 10H5a5.006 5.006 0 0 0-5 5v2a1 1 0 0 0 1 1h4.259a2.975 2.975 0 0 1-.15-1.639ZM8.05 17.95a1 1 0 0 1-.981-1.2l.708-3.536a1 1 0 0 1 .274-.511l6.363-6.364a3.007 3.007 0 0 1 4.243 0 3.007 3.007 0 0 1 0 4.243l-6.365 6.363a1 1 0 0 1-.511.274l-3.536.708a1.07 1.07 0 0 1-.195.023Z" />
+                  </svg>
+                )}
+              </span>
+            </h1>
 
-          {!otherUsers ? <div className="flex justify-end ">
-            <Breadcrumbs className="opacity-100">
-              <a
-                href="#"
-                className="opacity-100"
-                onClick={handleFollowingModalContents}
-              >
-                Following
-              </a>
-            </Breadcrumbs>
-            <Breadcrumbs className="w-24 ml-5 opacity-100">
-              <a
-                href="#"
-                className="opacity-100"
-                onClick={handleFollowersModalContents}
-              >
-                Followers
-              </a>
-            </Breadcrumbs>
-          </div> : ""}
+            {!otherUsers ? (
+              <div className="flex justify-end ">
+                <Breadcrumbs className="opacity-100">
+                  <a
+                    href="#"
+                    className="opacity-100"
+                    onClick={handleFollowingModalContents}
+                  >
+                    Following
+                  </a>
+                </Breadcrumbs>
+                <Breadcrumbs className="w-24 ml-5 opacity-100">
+                  <a
+                    href="#"
+                    className="opacity-100"
+                    onClick={handleFollowersModalContents}
+                  >
+                    Followers
+                  </a>
+                </Breadcrumbs>
+              </div>
+            ) : (
+              ""
+            )}
+          </div>
+          <Typography
+            variant="lead"
+            color="blue-gray"
+            className=" ml-64 text-sm font-mono break-normal"
+            style={{ maxWidth: "250px" }}
+          >
+            {otherUsers ? otherUsers?.bio : userToDisplay?.bio}
+          </Typography>
         </div>
-        <Typography
-          variant="lead"
-          color="blue-gray"
-          className=" ml-64 text-sm font-mono break-normal"
-          style={{ maxWidth: "250px" }}
-        >
-          {otherUsers ? otherUsers?.bio : userToDisplay?.bio}
-        </Typography>
-      </div>
+      )}
       <Modal
         className="w-2/6 h-full"
         isOpen={isEditModalOpen}
@@ -403,7 +410,7 @@ export function CoverProfileImageDetails(Id) {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            background: "rgba(0, 0, 0, 0.5)", // Reduce background opacity
+            background: "rgba(0, 0, 0, 0.5)",
           },
           content: {
             position: "relative",
@@ -417,7 +424,7 @@ export function CoverProfileImageDetails(Id) {
             WebkitOverflowScrolling: "touch",
             borderRadius: "4px",
             outline: "none",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // Add shadow
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
             height: "95%",
             minWidth: "300px",
             maxWidth: "80%",

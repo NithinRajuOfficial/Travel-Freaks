@@ -64,7 +64,7 @@ export function SignupForm({ closeSignupModal, openLoginModal }) {
         <Typography variant="h4" color="blue-gray">
           Sign Up
         </Typography>
-        <Typography color="gray" className="mt-1 font-normal">
+        <Typography className="mt-1 font-normal text-gray-800">
           Enter your details to register.
         </Typography>
         <form className="mt-8 mb-2" onSubmit={formik.handleSubmit}>
@@ -77,8 +77,7 @@ export function SignupForm({ closeSignupModal, openLoginModal }) {
             label={
               <Typography
                 variant="small"
-                color="gray"
-                className="flex items-center font-normal hover:cursor-default"
+                className="flex items-center font-normal hover:cursor-default text-gray-800"
               >
                 I agree the
                 <a
@@ -109,7 +108,7 @@ export function SignupForm({ closeSignupModal, openLoginModal }) {
             Already have an account?{" "}
             <a
               href="#"
-              className="font-medium text-gray-900"
+              className="font-medium text-black transition-colors duration-300 hover:text-white"
               onClick={() => {
                 closeSignupModal();
                 openLoginModal();

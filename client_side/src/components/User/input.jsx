@@ -8,7 +8,7 @@ import {
   PopoverContent,
 } from "@material-tailwind/react";
 
-function InputTag({ data, formik, type }) {
+function InputTag({ data, formik, type, status }) {
   const InputComponent = (type === "textarea" && Textarea) || Input;
 
   return (
@@ -20,6 +20,7 @@ function InputTag({ data, formik, type }) {
           label={data.label}
           name={data.name}
           type={data.type}
+          disabled={status ? status : false}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
           value={formik.values[data.name]}
@@ -49,7 +50,7 @@ function InputTag({ data, formik, type }) {
   );
 }
 
-function ItineryErrorValidations({ day, index, formik }) {
+function ItineryErrorValidations({ day, index, formik, status }) {
   return (
     <div className="space-y-4">
       {day.activities.map((activity, activityIndex) => {
@@ -64,6 +65,7 @@ function ItineryErrorValidations({ day, index, formik }) {
                 label={`Day ${day.day} Activity Description`}
                 name={`itinerary[${index}].activities[${activityIndex}].description`}
                 value={activity.description}
+                disabled={status}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
               />
@@ -98,6 +100,7 @@ function ItineryErrorValidations({ day, index, formik }) {
                 label={`Day ${day.day} Activity Start Time`}
                 name={`itinerary[${index}].activities[${activityIndex}].startTime`}
                 value={activity.startTime}
+                disabled={status}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
               />
@@ -132,6 +135,7 @@ function ItineryErrorValidations({ day, index, formik }) {
                 label={`Day ${day.day} Activity End Time`}
                 name={`itinerary[${index}].activities[${activityIndex}].endTime`}
                 value={activity.endTime}
+                disabled={status}
                 onChange={formik.handleChange}
                 onBlur={formik.handleBlur}
               />

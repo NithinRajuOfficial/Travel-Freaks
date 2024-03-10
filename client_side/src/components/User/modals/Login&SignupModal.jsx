@@ -25,13 +25,14 @@ export function LoginModal({ isOpen, onRequestClose }) {
   const modalStyles = {
     content: {
       width: "90%",
-      height: "auto",
-      maxWidth: "500px",
+      height: "70%",
+      maxWidth: "420px",
       margin: "auto",
       backgroundColor: "transparent",
       borderRadius: "8px",
       overflow: "hidden",
       border: "none",
+      outline:"none"
     },
     overlay: {
       display: "flex",
