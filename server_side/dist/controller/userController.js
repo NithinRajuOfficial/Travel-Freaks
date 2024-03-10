@@ -59,6 +59,7 @@ exports.userController = {
     updatePost: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         var _b, _c;
         try {
+            console.log("came");
             const file = req.uploadedFile;
             const postId = req.params.postId;
             const itineraryObj = JSON.parse(req.body.itinerary);

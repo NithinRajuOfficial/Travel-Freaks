@@ -10,6 +10,17 @@ import {
 
 function InputTag({ data, formik, type, status }) {
   const InputComponent = (type === "textarea" && Textarea) || Input;
+  // const startDateString = formik.values?.startDate;
+  // const endDateString = formik.values?.endDate;
+
+  // const date = {
+  //   startDate: startDateString
+  //     ? new Date(startDateString).toISOString().split("T")[0]
+  //     : null,
+  //   endDate: endDateString
+  //     ? new Date(endDateString).toISOString().split("T")[0]
+  //     : null,
+  // };
 
   return (
     <>
@@ -23,7 +34,7 @@ function InputTag({ data, formik, type, status }) {
           disabled={status ? status : false}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          value={formik.values[data.name]}
+          value={formik.values[data.name] || formik.values.budget[data.name]}
         />
         {formik.touched[data.name] && formik.errors[data.name] ? (
           <Popover placement="right">

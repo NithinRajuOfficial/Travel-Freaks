@@ -89,6 +89,8 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
   async function editPost(formData) {
     try {
       dispatch(fetchPostStart());
+      setStatus(true);
+      console.log(formData,"[[[[[[")
       const response = await api.patch(
         `user/editPost/${postData._id}`,
         formData
@@ -98,6 +100,7 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
       dispatch(fetchPostSuccess(updatedPostData));
       onSuccess();
       showSuccess("Post Edited Successfully");
+      setStatus(false);
     } catch (error) {
       dispatch(fetchPostFailure(error.message));
       console.error("Post Creating error:", error);

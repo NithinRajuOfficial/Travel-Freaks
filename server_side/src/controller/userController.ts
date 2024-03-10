@@ -65,6 +65,7 @@ export const userController = {
   // updating post details
   updatePost: async (req: Request, res: Response) => {
     try {
+      console.log("came")
       const file = req.uploadedFile;
       const postId = req.params.postId;
       const itineraryObj = JSON.parse(req.body.itinerary);
