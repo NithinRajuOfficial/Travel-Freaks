@@ -25,7 +25,7 @@ userRoute.get('/getAllUsers', accessTokenVerificationMiddleware_1.verifyAccessTo
 // Route for updating the user details 
 userRoute.patch("/updateUserDetails", accessTokenVerificationMiddleware_1.verifyAccessTokenMiddleware, (0, roleCheckMiddleware_1.default)(constants_1.ROLE.user), (0, multerConfig_1.handleFileUpload)('profileImage'), userController_1.userController.updateUserDetails);
 // Route for getting the post details
-userRoute.get("/postDetails", accessTokenVerificationMiddleware_1.verifyAccessTokenMiddleware, (0, roleCheckMiddleware_1.default)(constants_1.ROLE.user), userController_1.userController.getPostDetails);
+userRoute.get("/postDetails", userController_1.userController.getPostDetails);
 // Route for adding or updating the user cover image 
 userRoute.post("/editCoveImg", accessTokenVerificationMiddleware_1.verifyAccessTokenMiddleware, (0, roleCheckMiddleware_1.default)(constants_1.ROLE.user), (0, multerConfig_1.handleFileUpload)('coverImg'), userController_1.userController.addOrUpdateUserCoverImg);
 // Route for adding a comment

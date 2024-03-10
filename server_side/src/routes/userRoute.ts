@@ -29,7 +29,7 @@ userRoute.get('/getAllUsers',verifyAccessTokenMiddleware,roleCheckMiddleware(ROL
 userRoute.patch("/updateUserDetails",verifyAccessTokenMiddleware,roleCheckMiddleware(ROLE.user),handleFileUpload('profileImage'),userController.updateUserDetails)
 
 // Route for getting the post details
-userRoute.get("/postDetails",verifyAccessTokenMiddleware,roleCheckMiddleware(ROLE.user),userController.getPostDetails)
+userRoute.get("/postDetails",userController.getPostDetails)
 
 // Route for adding or updating the user cover image 
 userRoute.post("/editCoveImg",verifyAccessTokenMiddleware,roleCheckMiddleware(ROLE.user),handleFileUpload('coverImg'),userController.addOrUpdateUserCoverImg)

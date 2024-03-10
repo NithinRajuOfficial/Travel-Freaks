@@ -60,9 +60,10 @@ export function HomePosts({ location, otherUserId }) {
   const fetchingPostDetails = async (postId) => {
     try {
       dispatch(fetchPostStart());
-
+      console.log(postId)
       const response = await api.get(`user/postDetails?postId=${postId}`);
       const postData = response.data.postDetails;
+      console.log(postData,"ppp")
       dispatch(fetchPostSuccess(postData));
 
       navigate("/postDetails");

@@ -244,6 +244,7 @@ exports.userController = {
     // getting post details
     getPostDetails: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         try {
+            console.log("mmm");
             const postId = req.query.postId;
             const postDetails = yield postSchema_1.Post.findById(postId).populate({
                 path: "userId",

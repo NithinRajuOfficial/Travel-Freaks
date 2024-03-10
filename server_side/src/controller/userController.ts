@@ -286,6 +286,7 @@ export const userController = {
   // getting post details
   getPostDetails: async (req: Request, res: Response) => {
     try {
+      console.log("mmm")
       const postId = req.query.postId;
 
       const postDetails = await PostModel.findById(postId).populate({
