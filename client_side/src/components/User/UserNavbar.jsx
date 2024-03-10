@@ -44,7 +44,7 @@ import { showSuccess } from "../../assets/tostify";
 export function NavbarDefault() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const userData = useSelector((state) => state.user.user);
+  const userData = useSelector((state) => state.user);
   const [allUsers, setAllUsers] = React.useState([]);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [currentPage, setCurrentPage] = React.useState(1);
@@ -56,7 +56,7 @@ export function NavbarDefault() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = React.useState(false);
   // const [isChatListModalOpen, setIsChatListModalOpen] = React.useState(false);
-
+  console.log(userData,"ooo")
   // Define the logout function
   const handleLogout = async () => {
     try {
@@ -212,7 +212,7 @@ export function NavbarDefault() {
 
   // profile menu component
   const profileMenuItems = [
-    userData
+    userData?.isAuthenticated
       ? {
           label: "My Profile",
           icon: UserCircleIcon,
@@ -225,7 +225,7 @@ export function NavbarDefault() {
     // },
     {
       label: userData?.name ? "Sign Out" : "Login",
-      icon: userData ? PowerIcon : ArrowRightOnRectangleIcon,
+      icon: userData?.name ? PowerIcon : ArrowRightOnRectangleIcon,
     },
   ];
   return (
@@ -289,19 +289,19 @@ export function NavbarDefault() {
                       }
                     }}
                     className={`flex items-center gap-2 rounded ${
-                      (userData && item.label === "Sign Out"
+                      (userData?.isAuthenticated && item.label === "Sign Out"
                         ? "hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10"
                         : "",
-                      !userData && item.label === "Login"
+                      !userData?.isAuthenticated && item.label === "Login"
                         ? "hover:bg-blue-500/10 focus:bg-blue-500/10 active:bg-blue-500/10"
                         : "")
                     }`}
                   >
                     {React.createElement(item.icon, {
                       className: `h-4 w-4 ${
-                        userData && item.label === "Sign Out"
+                        userData?.isAuthenticated && item.label === "Sign Out"
                           ? "text-red-500"
-                          : !userData && item.label === "Login"
+                          : !userData?.isAuthenticated && item.label === "Login"
                           ? "text-blue-500"
                           : ""
                       }`,
@@ -313,9 +313,9 @@ export function NavbarDefault() {
                       variant="small"
                       className="font-normal"
                       color={
-                        userData && item.label === "Sign Out"
+                        userData?.isAuthenticated && item.label === "Sign Out"
                           ? "red"
-                          : !userData && item.label === "Login"
+                          : !userData?.isAuthenticated && item.label === "Login"
                           ? "blue"
                           : ""
                       }
