@@ -47,7 +47,7 @@ export function SignupForm({ closeSignupModal, openLoginModal }) {
       navigate("/");
     } catch (error) {
       console.error("Registration error:", error);
-      setError("Registeration Error, try again maybe!!!");
+      setError(error.response.data.message);
     }
   };
 

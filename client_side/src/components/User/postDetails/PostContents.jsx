@@ -81,14 +81,14 @@ export function PostContentCard() {
           <div>
             {postData?.userId?._id !== userData?._id ? (
               <div className="flex justify-end">
-                <Avatar src={postData?.userId.profileImage} alt="avatar" />
+                <Avatar src={postData?.userId?.profileImage} alt="avatar" />
                 <div className="mt-3 ml-2">
                   <Typography
                     variant="h6"
                     className="hover:cursor-pointer"
                     onClick={() => postCreatorProfile(postData?.userId?._id)}
                   >
-                    {postData?.userId.name}
+                    {postData?.userId?.name}
                   </Typography>
                 </div>
               </div>
