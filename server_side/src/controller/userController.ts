@@ -23,6 +23,7 @@ export const userController = {
       const userId = req.payload?.userId;
       // extracting file from the request header
       const file = req.uploadedFile;
+      console.log(file)
       // Extracting post data from the request
       const {
         title,

@@ -28,6 +28,7 @@ exports.userController = {
             const userId = (_a = req.payload) === null || _a === void 0 ? void 0 : _a.userId;
             // extracting file from the request header
             const file = req.uploadedFile;
+            console.log(file);
             // Extracting post data from the request
             const { title, description, startDate, endDate, location, itinerary, amount, currency, maxNoOfPeoples, } = req.body;
             // Creating a new post

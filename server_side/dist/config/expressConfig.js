@@ -12,7 +12,7 @@ const expressConfig = (app) => {
     const enableCors = {
         origin: "*",
         exposeHeaders: [
-            "Cros-Origin-Opener-Policy",
+            "Cross-Origin-Opener-Policy",
             "Cross-Origin-Resource-Policy",
         ],
     };
