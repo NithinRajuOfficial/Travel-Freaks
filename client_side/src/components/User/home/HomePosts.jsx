@@ -42,7 +42,7 @@ export function HomePosts({ location, otherUserId }) {
         !fetchingMore &&
         window.innerHeight + window.scrollY >=
           document.body.offsetHeight - 100 &&
-        filteredPosts.length > visiblePosts // Check if there are more posts to fetch
+        filteredPosts.length > visiblePosts
       ) {
         setFetchingMore(true);
         setTimeout(() => {
@@ -53,17 +53,16 @@ export function HomePosts({ location, otherUserId }) {
     };
 
     window.addEventListener("scroll", handleScroll);
-
+    setFetchingMore(false);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [fetchingMore, filteredPosts, visiblePosts]);
 
   const fetchingPostDetails = async (postId) => {
     try {
       dispatch(fetchPostStart());
-      console.log(postId)
+      console.log(postId);
       const response = await api.get(`user/postDetails?postId=${postId}`);
       const postData = response.data.postDetails;
-      console.log(postData,"ppp")
       dispatch(fetchPostSuccess(postData));
 
       navigate("/postDetails");
@@ -178,7 +177,7 @@ export function HomePosts({ location, otherUserId }) {
             </Card>
           ))
         ) : (
-          <div>No posts available</div>
+          <div className="text-xl font-semibold">Add Some Posts</div>
         )}
         {fetchingMore && (
           <div className="flex flex-row m-24">

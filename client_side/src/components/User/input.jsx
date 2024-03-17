@@ -10,17 +10,6 @@ import {
 
 function InputTag({ data, formik, type, status }) {
   const InputComponent = (type === "textarea" && Textarea) || Input;
-  // const startDateString = formik.values?.startDate;
-  // const endDateString = formik.values?.endDate;
-
-  // const date = {
-  //   startDate: startDateString
-  //     ? new Date(startDateString).toISOString().split("T")[0]
-  //     : null,
-  //   endDate: endDateString
-  //     ? new Date(endDateString).toISOString().split("T")[0]
-  //     : null,
-  // };
 
   return (
     <>
@@ -28,13 +17,16 @@ function InputTag({ data, formik, type, status }) {
         <InputComponent
           color={data?.color && data?.color}
           size="lg"
-          label={data.label}
-          name={data.name}
-          type={data.type}
+          label={data?.label}
+          name={data?.name}
+          type={data?.type}
           disabled={status ? status : false}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          value={formik.values[data.name] || formik.values.budget[data.name]}
+          onChange={formik?.handleChange}
+          onBlur={formik?.handleBlur}
+          value={
+            formik?.values[data?.name] ||
+            (formik?.values.budget && formik?.values.budget[data?.name])
+          }
         />
         {formik.touched[data.name] && formik.errors[data.name] ? (
           <Popover placement="right">
@@ -182,3 +174,15 @@ function ItineryErrorValidations({ day, index, formik, status }) {
 }
 
 export { InputTag, ItineryErrorValidations };
+
+// const startDateString = formik.values?.startDate;
+// const endDateString = formik.values?.endDate;
+
+// const date = {
+//   startDate: startDateString
+//     ? new Date(startDateString).toISOString().split("T")[0]
+//     : null,
+//   endDate: endDateString
+//     ? new Date(endDateString).toISOString().split("T")[0]
+//     : null,
+// };
