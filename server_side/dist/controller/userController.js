@@ -41,7 +41,8 @@ exports.userController = {
                 endDate: new Date(endDate),
                 location: location,
                 itinerary: JSON.parse(itinerary),
-                budget: { amount, currency },
+                amount,
+                currency,
                 maxNoOfPeoples: maxNoOfPeoples,
             });
             // Save the new post
@@ -58,9 +59,8 @@ exports.userController = {
     }),
     // updating post details
     updatePost: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        var _b, _c;
         try {
-            console.log("came");
+            console.log(req.body, "came");
             const file = req.uploadedFile;
             const postId = req.params.postId;
             const itineraryObj = JSON.parse(req.body.itinerary);
@@ -70,6 +70,7 @@ exports.userController = {
                     .status(400)
                     .json({ error: "No Post found on the id provided" });
             }
+            // Update post fields if values are different
             if (req.body.title !== matchedPost.title) {
                 matchedPost.title = req.body.title;
             }
@@ -79,7 +80,7 @@ exports.userController = {
             if (req.body.startDate !== matchedPost.startDate) {
                 matchedPost.startDate = new Date(req.body.startDate);
             }
-            if (req.body.endDate !== matchedPost.startDate) {
+            if (req.body.endDate !== matchedPost.endDate) {
                 matchedPost.endDate = new Date(req.body.endDate);
             }
             if (req.body.location !== matchedPost.location) {
@@ -88,18 +89,17 @@ exports.userController = {
             if (itineraryObj && Array.isArray(itineraryObj)) {
                 matchedPost.itinerary = itineraryObj;
             }
-            if (req.body.currency !== ((_b = matchedPost.budget) === null || _b === void 0 ? void 0 : _b.currency) ||
-                req.body.amount !== ((_c = matchedPost.budget) === null || _c === void 0 ? void 0 : _c.amount)) {
-                matchedPost.budget = {
-                    currency: req.body.currency,
-                    amount: req.body.amount,
-                };
+            // Update currency and amount if they are different
+            if (req.body.currency !== matchedPost.currency ||
+                req.body.amount !== matchedPost.amount) {
+                matchedPost.currency = req.body.currency;
+                matchedPost.amount = req.body.amount;
             }
             if (req.body.maxNoOfPeoples !== matchedPost.maxNoOfPeoples) {
                 matchedPost.maxNoOfPeoples = req.body.maxNoOfPeoples;
             }
             if (file) {
-                matchedPost.image = file && file;
+                matchedPost.image = file;
             }
             yield matchedPost.save();
             res
@@ -127,7 +127,7 @@ exports.userController = {
     }),
     // getting user details
     getUserDetails: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        var _d, _e;
+        var _b, _c;
         try {
             // Retrieve userId from the custom response header
             // const userId = res.get("X-UserId");
@@ -136,7 +136,7 @@ exports.userController = {
                 userId = req.params.userId;
             }
             else {
-                userId = (_d = req.payload) === null || _d === void 0 ? void 0 : _d.userId;
+                userId = (_b = req.payload) === null || _b === void 0 ? void 0 : _b.userId;
             }
             // retrieving data of that particular user from the database
             const userDetails = yield userSchema_1.User.findById(userId);
@@ -146,7 +146,7 @@ exports.userController = {
             }
             // Check if the user identified by req.payload.userId follows the user identified by req.params.userId
             const followingDocument = yield followRelationshipSchema_1.Following.findOne({
-                userId: (_e = req.payload) === null || _e === void 0 ? void 0 : _e.userId,
+                userId: (_c = req.payload) === null || _c === void 0 ? void 0 : _c.userId,
                 followingId: userId,
             });
             const isFollowing = !!followingDocument; // Convert to a boolean indicating whether the following relationship exists
@@ -163,10 +163,10 @@ exports.userController = {
     }),
     // Updating user details
     updateUserDetails: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        var _f;
+        var _d;
         try {
             // Retrieve userId from the custom response header
-            const userId = (_f = req.payload) === null || _f === void 0 ? void 0 : _f.userId;
+            const userId = (_d = req.payload) === null || _d === void 0 ? void 0 : _d.userId;
             const file = req.uploadedFile;
             //matching the user id with db to get the specific user
             const user = yield userSchema_1.User.findById(userId);
@@ -211,9 +211,9 @@ exports.userController = {
     }),
     // getting all users from the db
     getAllUsers: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        var _g;
+        var _e;
         try {
-            const loggedInUserId = (_g = req.payload) === null || _g === void 0 ? void 0 : _g.userId;
+            const loggedInUserId = (_e = req.payload) === null || _e === void 0 ? void 0 : _e.userId;
             const page = parseInt(req.query.page) || 1;
             const pageSize = parseInt(req.query.pageSize);
             2;
@@ -268,9 +268,9 @@ exports.userController = {
     }),
     // Route for adding or updating the user cover img
     addOrUpdateUserCoverImg: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        var _h;
+        var _f;
         try {
-            const userId = (_h = req.payload) === null || _h === void 0 ? void 0 : _h.userId;
+            const userId = (_f = req.payload) === null || _f === void 0 ? void 0 : _f.userId;
             const file = req.uploadedFile;
             const user = yield userSchema_1.User.findById(userId);
             if (!user) {
@@ -289,10 +289,10 @@ exports.userController = {
     }),
     // to add a specific user to the following list
     addToFollowing: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        var _j;
+        var _g;
         try {
             const idOfTheUserToBeFollowed = req.query.userIdToFollow;
-            const userId = (_j = req.payload) === null || _j === void 0 ? void 0 : _j.userId;
+            const userId = (_g = req.payload) === null || _g === void 0 ? void 0 : _g.userId;
             // Checking id the user is already following the targeted user
             const existingFollowing = yield followRelationshipSchema_1.Following.findOne({
                 userId,
@@ -336,9 +336,9 @@ exports.userController = {
     }),
     // to get the following list of the user
     getFollowingList: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        var _k;
+        var _h;
         try {
-            const userId = (_k = req.payload) === null || _k === void 0 ? void 0 : _k.userId;
+            const userId = (_h = req.payload) === null || _h === void 0 ? void 0 : _h.userId;
             const followingList = yield followRelationshipSchema_1.Following.find({ userId: userId }).populate("followingId");
             res.status(200).json({
                 message: "Successfully got users following list",
@@ -352,9 +352,9 @@ exports.userController = {
     }),
     // to get the followers list of the user
     getFollowersList: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        var _l;
+        var _j;
         try {
-            const userId = (_l = req.payload) === null || _l === void 0 ? void 0 : _l.userId;
+            const userId = (_j = req.payload) === null || _j === void 0 ? void 0 : _j.userId;
             const followersList = yield followRelationshipSchema_1.Following.find({
                 followingId: userId,
             }).populate({ path: "userId", select: "name profileImage" });
@@ -392,10 +392,10 @@ exports.userController = {
     }),
     // function to like or unlike a post
     likeOrUnlike: (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        var _m;
+        var _k;
         try {
             const postId = req.params.postId;
-            const userId = (_m = req.payload) === null || _m === void 0 ? void 0 : _m.userId;
+            const userId = (_k = req.payload) === null || _k === void 0 ? void 0 : _k.userId;
             let currentLikeStatus = false;
             console.log(userId, "ppp");
             if (!userId) {

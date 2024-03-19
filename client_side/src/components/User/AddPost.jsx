@@ -43,6 +43,7 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
     amount: "",
     maxNoOfPeoples: 0,
   };
+  
 
   const validationSchema = postFormInputValidations;
 
@@ -90,6 +91,7 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
     try {
       dispatch(fetchPostStart());
       setStatus(true);
+      console.log("came")
       console.log(formData,"[[[[[[")
       const response = await api.patch(
         `user/editPost/${postData._id}`,

@@ -59,15 +59,13 @@ const postSchema = new mongoose_1.default.Schema({
             ],
         },
     ],
-    budget: {
-        currency: {
-            type: String,
-            required: true,
-        },
-        amount: {
-            type: Number,
-            required: true,
-        },
+    currency: {
+        type: String,
+        required: true,
+    },
+    amount: {
+        type: Number,
+        required: true,
     },
     maxNoOfPeoples: {
         type: Number,

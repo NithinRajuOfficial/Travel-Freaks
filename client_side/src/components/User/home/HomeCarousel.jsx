@@ -1,11 +1,13 @@
 import { Carousel, Typography } from "@material-tailwind/react";
+import { carouselData } from "../../../assets/constants";
  
 export function HomeCarousel() {
   return (
     <Carousel className="rounded-xl">
-      <div className="relative h-96 w-full">
+      {carouselData.map((elm,i)=>(
+        <div key={i} className="relative h-96 w-full">
         <img
-          src="https://images.unsplash.com/photo-1497436072909-60f360e1d4b1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2560&q=80"
+          src={elm.img}
           alt="image 1"
           className="h-full w-full object-cover"
         />
@@ -14,31 +16,21 @@ export function HomeCarousel() {
             <Typography
               variant="h1"
               color="white"
-              className="mb-4 text-3xl md:text-4xl lg:text-6xl opacity-70"
+              className="mb-4 text-3xl md:text-4xl lg:text-6xl opacity-70 font-black"
             >
-              The Beauty of Nature
+              {elm.title}
             </Typography>
             <Typography
               variant="lead"
               color="white"
-              className="mb-12 opacity-50"
+              className="mb-12 opacity-60"
             >
-              It is not so much for its beauty that the forest makes a claim
-              upon men&apos;s hearts, as for that subtle something, that quality
-              of air that emanation from old trees, that so wonderfully changes
-              and renews a weary spirit.
+              {elm.description}
             </Typography>
-            {/* <div className="flex justify-center gap-2">
-              <Button size="lg" color="white">
-                Explore
-              </Button>
-              <Button size="lg" color="white" variant="text">
-                Gallery
-              </Button>
-            </div> */}
           </div>
         </div>
       </div>
+      ))}
     </Carousel>
   );
 }

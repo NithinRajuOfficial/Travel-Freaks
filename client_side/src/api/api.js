@@ -18,8 +18,8 @@ import axios from "axios";
 
 
 export const api = axios.create({
-  // baseURL: "http://localhost:5500/api/",
-  baseURL:"https://travelfreaks.nithin.website/api/"
+  baseURL: "http://localhost:5500/api/",
+  // baseURL:"https://travelfreaks.nithin.website/api/"
 });
 
 // export const refreshApi = axios.create({

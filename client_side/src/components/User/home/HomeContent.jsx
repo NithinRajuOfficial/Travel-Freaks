@@ -6,7 +6,6 @@ import { useSelector } from "react-redux";
 
 export function HomeContent() {
   const user = useSelector(state => state.user)
-  console.log(user,"[[[")
   // const modalStyles = {
   //   content: {
   //     width: "500px",
@@ -24,9 +23,9 @@ export function HomeContent() {
   // };
   const modalStyles = {
     content: {
-      width: "90%", // Adjust the width as needed
-      maxWidth: "1200px", // Set a maximum width if desired
-      margin: "0 auto", // Center the content horizontally
+      width: "90%",
+      maxWidth: "1200px", 
+      margin: "0 auto", 
       backgroundColor: "white",
       borderRadius: "8px",
       padding: "20px",

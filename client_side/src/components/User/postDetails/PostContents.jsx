@@ -141,7 +141,7 @@ export function PostContentCard() {
                   />
                 </Typography>
                 <Typography>
-                  {postData?.budget?.amount} {postData?.budget?.currency}
+                  {postData?.amount} {postData?.currency}
                 </Typography>
               </div>
             </div>

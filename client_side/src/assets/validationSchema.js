@@ -89,11 +89,16 @@ const postFormInputValidations = Yup.object({
     })
   ),
 
-  currency: Yup.string().trim().required("Currency is required"),
-  amount: Yup.number()
-    .required("Amount is required")
-    .min(1, "Must be at least 1"),
-
+  currency: Yup.string().when("isEdit", {
+    is: false,
+    then: Yup.string().trim().required("Currency is required"),
+  }),
+  amount: Yup.number().when("isEdit", {
+    is: false,
+    then: Yup.number()
+      .required("Amount is required")
+      .min(1, "Must be at least 1"),
+  }),
   maxNoOfPeoples: Yup.number()
     .required("Maximum Number of People is required")
     .min(1, "Must be at least 1"),

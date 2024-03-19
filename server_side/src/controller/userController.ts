@@ -23,7 +23,7 @@ export const userController = {
       const userId = req.payload?.userId;
       // extracting file from the request header
       const file = req.uploadedFile;
-      console.log(file)
+      console.log(file);
       // Extracting post data from the request
       const {
         title,
@@ -47,7 +47,8 @@ export const userController = {
         endDate: new Date(endDate),
         location: location,
         itinerary: JSON.parse(itinerary),
-        budget: { amount, currency },
+        amount,
+        currency,
         maxNoOfPeoples: maxNoOfPeoples,
       });
 
@@ -66,7 +67,7 @@ export const userController = {
   // updating post details
   updatePost: async (req: Request, res: Response) => {
     try {
-      console.log("came")
+      console.log(req.body, "came");
       const file = req.uploadedFile;
       const postId = req.params.postId;
       const itineraryObj = JSON.parse(req.body.itinerary);
@@ -79,6 +80,7 @@ export const userController = {
           .json({ error: "No Post found on the id provided" });
       }
 
+      // Update post fields if values are different
       if (req.body.title !== matchedPost.title) {
         matchedPost.title = req.body.title;
       }
@@ -91,7 +93,7 @@ export const userController = {
         matchedPost.startDate = new Date(req.body.startDate);
       }
 
-      if (req.body.endDate !== matchedPost.startDate) {
+      if (req.body.endDate !== matchedPost.endDate) {
         matchedPost.endDate = new Date(req.body.endDate);
       }
 
@@ -103,14 +105,13 @@ export const userController = {
         matchedPost.itinerary = itineraryObj;
       }
 
+      // Update currency and amount if they are different
       if (
-        req.body.currency !== matchedPost.budget?.currency ||
-        req.body.amount !== matchedPost.budget?.amount
+        req.body.currency !== matchedPost.currency ||
+        req.body.amount !== matchedPost.amount
       ) {
-        matchedPost.budget = {
-          currency: req.body.currency,
-          amount: req.body.amount,
-        };
+        matchedPost.currency = req.body.currency;
+        matchedPost.amount = req.body.amount;
       }
 
       if (req.body.maxNoOfPeoples !== matchedPost.maxNoOfPeoples) {
@@ -118,7 +119,7 @@ export const userController = {
       }
 
       if (file) {
-        matchedPost.image = file && (file as unknown as string);
+        matchedPost.image = file as unknown as string;
       }
 
       await matchedPost.save();
@@ -288,7 +289,7 @@ export const userController = {
   // getting post details
   getPostDetails: async (req: Request, res: Response) => {
     try {
-      console.log("mmm")
+      console.log("mmm");
       const postId = req.query.postId;
 
       const postDetails = await PostModel.findById(postId).populate({
