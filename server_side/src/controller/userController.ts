@@ -151,13 +151,8 @@ export const userController = {
     try {
       // Retrieve userId from the custom response header
       // const userId = res.get("X-UserId");
-      let userId;
-      if (req.params.userId) {
-        userId = req.params.userId;
-      } else {
-        userId = req.payload?.userId;
-      }
-
+      let userId = req.params?.userId;
+      
       // retrieving data of that particular user from the database
       const userDetails = await UserModel.findById(userId);
 

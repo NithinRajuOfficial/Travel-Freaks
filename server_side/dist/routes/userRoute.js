@@ -19,7 +19,7 @@ userRoute.patch("/editPost/:postId", accessTokenVerificationMiddleware_1.verifyA
 // Route for getting all posts
 userRoute.get("/getAllPosts", userController_1.userController.getAllPosts);
 // Route for getting the user details
-userRoute.get('/userDetails/:userId?', accessTokenVerificationMiddleware_1.verifyAccessTokenMiddleware, (0, roleCheckMiddleware_1.default)(constants_1.ROLE.user), userController_1.userController.getUserDetails);
+userRoute.get('/userDetails/:userId?', userController_1.userController.getUserDetails);
 // Route for getting all users
 userRoute.get('/getAllUsers', accessTokenVerificationMiddleware_1.verifyAccessTokenMiddleware, (0, roleCheckMiddleware_1.default)(constants_1.ROLE.user), userController_1.userController.getAllUsers);
 // Route for updating the user details 

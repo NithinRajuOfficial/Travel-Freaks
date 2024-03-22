@@ -20,7 +20,7 @@ userRoute.patch("/editPost/:postId",verifyAccessTokenMiddleware,roleCheckMiddlew
 userRoute.get("/getAllPosts",userController.getAllPosts)
 
 // Route for getting the user details
-userRoute.get('/userDetails/:userId?',verifyAccessTokenMiddleware,roleCheckMiddleware(ROLE.user),userController.getUserDetails)
+userRoute.get('/userDetails/:userId?',userController.getUserDetails)
 
 // Route for getting all users
 userRoute.get('/getAllUsers',verifyAccessTokenMiddleware,roleCheckMiddleware(ROLE.user),userController.getAllUsers)

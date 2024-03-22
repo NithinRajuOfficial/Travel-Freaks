@@ -40,7 +40,6 @@ import { LoginModal } from "./modals/Login&SignupModal";
 import { showSuccess } from "../../assets/tostify";
 // import ChatListModal from "./chat/SearchUsersModal";
 
-
 export function NavbarDefault() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -56,18 +55,22 @@ export function NavbarDefault() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = React.useState(false);
   // const [isChatListModalOpen, setIsChatListModalOpen] = React.useState(false);
-  console.log(userData,"ooo")
+  console.log(userData, "ooo");
   // Define the logout function
   const handleLogout = async () => {
     try {
       const refreshToken = localStorage.getItem("refreshToken");
 
       // Send a POST request to the logout route with the authorization header
-      await axios.post("https://travelfreaks.nithin.website/api/auth/logout", null, {
-        headers: {
-          Authorization: `Bearer ${refreshToken}`,
-        },
-      });
+      await axios.post(
+        "https://travelfreaks.nithin.website/api/auth/logout",
+        null,
+        {
+          headers: {
+            Authorization: `Bearer ${refreshToken}`,
+          },
+        }
+      );
 
       // Clear tokens from local storage
       localStorage.removeItem("refreshToken");
@@ -76,7 +79,7 @@ export function NavbarDefault() {
       dispatch(clearUser());
 
       navigate("/");
-      showSuccess("Logout Success")
+      showSuccess("Logout Success");
     } catch (error) {
       console.error("Logout error:", error);
     }
@@ -192,21 +195,31 @@ export function NavbarDefault() {
         className="p-1 font-normal"
       >
         <a href="#" className="flex items-center ">
-        {/* <BsChatSquareText className="text-xl" onClick={toggleDrawer}/> */}
+          {/* <BsChatSquareText className="text-xl" onClick={toggleDrawer}/> */}
         </a>
       </Typography>
-     
-      <Typography
-        as="li"
-        variant="small"
-        color="blue-gray"
-        className="p-1 font-normal"
-        onClick={getAllUsers}
-      >
-        <a href="#" className="flex items-center">
-       < GiThreeFriends  className="text-xl"/>
-        </a>
-      </Typography>
+
+      {userData.isAuthenticated && (
+        <Tooltip
+          content={
+            <Typography>
+              <small>Find Users</small>
+            </Typography>
+          }
+        >
+          <Typography
+            as="li"
+            variant="small"
+            color="blue-gray"
+            className="p-1 font-normal"
+            onClick={getAllUsers}
+          >
+            <a href="#" className="flex items-center">
+              <GiThreeFriends className="text-xl" />
+            </a>
+          </Typography>
+        </Tooltip>
+      )}
     </ul>
   );
 
@@ -241,98 +254,100 @@ export function NavbarDefault() {
           <span className="text-4xl font-bold text-blue-500">Travel</span>
           <span className="text-4xl font-bold text-green-500">Freaks</span>
         </Typography>
-        <div className="hidden lg:block">{navList}</div>
-        <div className="flex flex-col items-center">
-          <Menu
-            open={isMenuOpen}
-            handler={setIsMenuOpen}
-            placement="bottom-end"
-          >
-            <MenuHandler>
-              <Button
-                variant="text"
-                color="blue-gray"
-                className="flex items-center gap-1 rounded-full py-0.5 pr-2 pl-0.5 lg:ml-auto"
-              >
-                <Avatar
-                  variant="circular"
-                  size="sm"
-                  alt=""
-                  className="border border-gray-900 p-0.5"
-                  src={
-                    userData?.profileImage
-                      ? userData.profileImage
-                      : defaultProImg
-                  }
-                />
-                <ChevronDownIcon
-                  strokeWidth={2.5}
-                  className={`h-3 w-3 transition-transform ${
-                    isMenuOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </Button>
-            </MenuHandler>
-            <MenuList className="p-1">
-              {profileMenuItems.map((item) => {
-                // Use a ternary operator to conditionally render MenuItem
-                return item ? (
-                  <MenuItem
-                    key={item.label}
-                    onClick={() => {
-                      if (item.label === "Sign Out") {
-                        handleLogout();
-                      } else if (item.label === "My Profile") {
-                        navigate("/profile");
-                      } else if (item.label === "Login") {
-                        setIsLoginModalOpen(true);
-                      }
-                    }}
-                    className={`flex items-center gap-2 rounded ${
-                      (userData && item.label === "Sign Out"
-                        ? "hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10"
-                        : "",
-                      !userData && item.label === "Login"
-                        ? "hover:bg-blue-500/10 focus:bg-blue-500/10 active:bg-blue-500/10"
-                        : "")
+        <div className="flex items-center gap-6">
+          <div className="hidden lg:block">{navList}</div>
+          <div className="flex flex-col items-center">
+            <Menu
+              open={isMenuOpen}
+              handler={setIsMenuOpen}
+              placement="bottom-end"
+            >
+              <MenuHandler>
+                <Button
+                  variant="text"
+                  color="blue-gray"
+                  className="flex items-center gap-1 rounded-full py-0.5 pr-2 pl-0.5 lg:ml-auto"
+                >
+                  <Avatar
+                    variant="circular"
+                    size="sm"
+                    alt=""
+                    className="border border-gray-900 p-0.5"
+                    src={
+                      userData?.profileImage
+                        ? userData.profileImage
+                        : defaultProImg
+                    }
+                  />
+                  <ChevronDownIcon
+                    strokeWidth={2.5}
+                    className={`h-3 w-3 transition-transform ${
+                      isMenuOpen ? "rotate-180" : ""
                     }`}
-                  >
-                    {React.createElement(item.icon, {
-                      className: `h-4 w-4 ${
-                        userData && item.label === "Sign Out"
-                          ? "text-red-500"
-                          : !userData && item.label === "Login"
-                          ? "text-blue-500"
-                          : ""
-                      }`,
-                      strokeWidth: 2,
-                    })}
-
-                    <Typography
-                      as="span"
-                      variant="small"
-                      className="font-normal"
-                      color={
-                        userData && item.label === "Sign Out"
-                          ? "red"
-                          : !userData && item.label === "Login"
-                          ? "blue"
-                          : ""
-                      }
+                  />
+                </Button>
+              </MenuHandler>
+              <MenuList className="p-1">
+                {profileMenuItems.map((item) => {
+                  // Use a ternary operator to conditionally render MenuItem
+                  return item ? (
+                    <MenuItem
+                      key={item.label}
+                      onClick={() => {
+                        if (item.label === "Sign Out") {
+                          handleLogout();
+                        } else if (item.label === "My Profile") {
+                          navigate("/profile");
+                        } else if (item.label === "Login") {
+                          setIsLoginModalOpen(true);
+                        }
+                      }}
+                      className={`flex items-center gap-2 rounded ${
+                        (userData && item.label === "Sign Out"
+                          ? "hover:bg-red-500/10 focus:bg-red-500/10 active:bg-red-500/10"
+                          : "",
+                        !userData && item.label === "Login"
+                          ? "hover:bg-blue-500/10 focus:bg-blue-500/10 active:bg-blue-500/10"
+                          : "")
+                      }`}
                     >
-                      {item.label}
-                    </Typography>
-                  </MenuItem>
-                ) : null;
-              })}
-            </MenuList>
-          </Menu>
-          {isLoginModalOpen && (
-            <LoginModal
-              isOpen={isLoginModalOpen}
-              onRequestClose={() => setIsLoginModalOpen(false)}
-            />
-          )}
+                      {React.createElement(item.icon, {
+                        className: `h-4 w-4 ${
+                          userData && item.label === "Sign Out"
+                            ? "text-red-500"
+                            : !userData && item.label === "Login"
+                            ? "text-blue-500"
+                            : ""
+                        }`,
+                        strokeWidth: 2,
+                      })}
+
+                      <Typography
+                        as="span"
+                        variant="small"
+                        className="font-normal"
+                        color={
+                          userData && item.label === "Sign Out"
+                            ? "red"
+                            : !userData && item.label === "Login"
+                            ? "blue"
+                            : ""
+                        }
+                      >
+                        {item.label}
+                      </Typography>
+                    </MenuItem>
+                  ) : null;
+                })}
+              </MenuList>
+            </Menu>
+            {isLoginModalOpen && (
+              <LoginModal
+                isOpen={isLoginModalOpen}
+                onRequestClose={() => setIsLoginModalOpen(false)}
+              />
+            )}
+          </div>
         </div>
         <Modal
           className="w-full md:w-2/3 lg:w-1/2 xl:w-1/3 h-full "
@@ -347,6 +362,7 @@ export function NavbarDefault() {
               zIndex: "99",
             },
             content: {
+              padding: "2px",
               position: "relative",
               top: "auto",
               left: "auto",

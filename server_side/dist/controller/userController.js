@@ -131,13 +131,7 @@ exports.userController = {
         try {
             // Retrieve userId from the custom response header
             // const userId = res.get("X-UserId");
-            let userId;
-            if (req.params.userId) {
-                userId = req.params.userId;
-            }
-            else {
-                userId = (_b = req.payload) === null || _b === void 0 ? void 0 : _b.userId;
-            }
+            let userId = (_b = req.params) === null || _b === void 0 ? void 0 : _b.userId;
             // retrieving data of that particular user from the database
             const userDetails = yield userSchema_1.User.findById(userId);
             // condition to handle error case in the getting the userDetails
