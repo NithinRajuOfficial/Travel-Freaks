@@ -16,17 +16,21 @@ import { api } from "../../../api/api";
 import { showError, showSuccess } from "../../../assets/tostify";
 
 export function CommentCard() {
-  // Assuming you have a selector for post data
   const postData = useSelector((state) => state.post.data);
   const user = useSelector((state) => state.user.user);
   const [newComment, setNewComment] = useState("");
   const [comments, setComments] = useState([]);
   const [currPage, setCurrPage] = useState(0);
   const [clickedShowMore, setClickedShowMore] = useState(false);
-  const [totalNoOfComments, setTotalNoOfComments] = useState(null);
+  const [totalNoOfComments, setTotalNoOfComments] = useState(0);
   const [reload, setReload] = useState(false);
   const navigate = useNavigate();
+  console.log(user,'ll')
   const addComment = async () => {
+    
+    if (!user) {
+      return showError("Please Login");
+    }
     if (newComment.trim() !== "") {
       try {
         const response = await api.post("user/addComment", {
@@ -34,7 +38,10 @@ export function CommentCard() {
           postId: postData._id,
           comment: newComment,
         });
-        setComments([...comments, response.data]);
+        if (response === "login") {
+          return showError("Please Login");
+        }
+        setComments([...comments, response?.data]);
         setNewComment("");
         setReload(true);
       } catch (error) {
@@ -50,11 +57,14 @@ export function CommentCard() {
   useEffect(() => {
     const fetchInitialComments = async () => {
       try {
+        if (!user.isAuthenticated) {
+          return false;
+        }
         const response = await api.get(`user/getComments/${postData._id}`, {
-          params: { skip: currPage * 3, limit: 3 }, 
+          params: { skip: currPage * 3, limit: 3 },
         });
-        const allComments = response.data.allComments;
-        setTotalNoOfComments(response.data.totalNoOfComments);
+        const allComments = response?.data?.allComments;
+        setTotalNoOfComments(response?.data?.totalNoOfComments);
         setReload(false);
 
         setComments(allComments);
@@ -68,7 +78,7 @@ export function CommentCard() {
       fetchInitialComments();
     }
   }, [postData, clickedShowMore, reload]);
-
+  console.log(currPage);
   // to get the commented users profile
   const commentedUserProfile = (userId) => {
     try {
@@ -79,21 +89,24 @@ export function CommentCard() {
   };
 
   // function to delete a comment
-  const handleCommentDelete = async(commentId) => {
+  const handleCommentDelete = async (commentId) => {
     try {
-      console.log(commentId,"=--");
-      const response = await api.delete(`user/deleteComment/${commentId}`)
-      console.log(response,"pppppp");
-      if(response.status === 200){
-        showSuccess(response.data.message)
-        setComments((prevComments) => prevComments.filter(comment => comment._id !== commentId));
-      }else{
-        showError("Something went wrong, please try again")
+      const response = await api.delete(`user/deleteComment/${commentId}`);
+      if (response.status === 200) {
+        showSuccess(response.data.message);
+        setComments((prevComments) =>
+          prevComments.filter((comment) => comment._id !== commentId)
+        );
+      } else {
+        showError("Something went wrong, please try again");
       }
     } catch (error) {
-      console.error("Something went wrong, unable to delete the comment:",error);
+      console.error(
+        "Something went wrong, unable to delete the comment:",
+        error
+      );
     }
-  }
+  };
 
   return (
     <div className=" h-full w-96 mt-10 ml-10">
@@ -104,7 +117,7 @@ export function CommentCard() {
       />
       <Card className="mt-6 w-96">
         <List>
-          {comments.map((comment) => (
+          {comments?.map((comment) => (
             <ListItem key={comment._id} className="hover:cursor-auto">
               <ListItemPrefix>
                 <Avatar
@@ -115,25 +128,29 @@ export function CommentCard() {
               </ListItemPrefix>
               <div>
                 <div className="flex flex-row">
-                <Typography
-                  variant="h6"
-                  color="blue-gray"
-                  className="w-5 hover:cursor-pointer mr-3"
-                  onClick={() => commentedUserProfile(comment?.userId._id)}
-                >
-                  {comment?.userId?.name}
-                </Typography>
-                {comment.userId?._id === user?._id ? ( <span className="ml-5 mt-1 hover:cursor-pointer">
-                  <svg
-                    viewBox="0 0 1024 1024"
-                    fill="red"
-                    height="1em"
-                    width="1em"
-                    onClick={()=> handleCommentDelete(comment._id)}
+                  <Typography
+                    variant="h6"
+                    color="blue-gray"
+                    className="w-5 hover:cursor-pointer mr-3"
+                    onClick={() => commentedUserProfile(comment?.userId?._id)}
                   >
-                    <path d="M360 184h-8c4.4 0 8-3.6 8-8v8h304v-8c0 4.4 3.6 8 8 8h-8v72h72v-80c0-35.3-28.7-64-64-64H352c-35.3 0-64 28.7-64 64v80h72v-72zm504 72H160c-17.7 0-32 14.3-32 32v32c0 4.4 3.6 8 8 8h60.4l24.7 523c1.6 34.1 29.8 61 63.9 61h454c34.2 0 62.3-26.8 63.9-61l24.7-523H888c4.4 0 8-3.6 8-8v-32c0-17.7-14.3-32-32-32zM731.3 840H292.7l-24.2-512h487l-24.2 512z" />
-                  </svg>
-                </span>) : ("")}
+                    {comment?.userId?.name}
+                  </Typography>
+                  {comment.userId?._id === user?._id ? (
+                    <span className="ml-5 mt-1 hover:cursor-pointer">
+                      <svg
+                        viewBox="0 0 1024 1024"
+                        fill="red"
+                        height="1em"
+                        width="1em"
+                        onClick={() => handleCommentDelete(comment._id)}
+                      >
+                        <path d="M360 184h-8c4.4 0 8-3.6 8-8v8h304v-8c0 4.4 3.6 8 8 8h-8v72h72v-80c0-35.3-28.7-64-64-64H352c-35.3 0-64 28.7-64 64v80h72v-72zm504 72H160c-17.7 0-32 14.3-32 32v32c0 4.4 3.6 8 8 8h60.4l24.7 523c1.6 34.1 29.8 61 63.9 61h454c34.2 0 62.3-26.8 63.9-61l24.7-523H888c4.4 0 8-3.6 8-8v-32c0-17.7-14.3-32-32-32zM731.3 840H292.7l-24.2-512h487l-24.2 512z" />
+                      </svg>
+                    </span>
+                  ) : (
+                    ""
+                  )}
                 </div>
                 <Typography
                   variant="small"

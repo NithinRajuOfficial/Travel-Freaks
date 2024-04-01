@@ -15,6 +15,7 @@ import {
 } from "@material-tailwind/react";
 import { api } from "../../../api/api";
 import { showSuccess, showError } from "../../../assets/tostify";
+import { defaultProImg } from "../../../assets/constants";
 import { PostCreationForm } from "../AddPost";
 
 export function PostContentCard() {
@@ -81,7 +82,10 @@ export function PostContentCard() {
           <div>
             {postData?.userId?._id !== userData?._id ? (
               <div className="flex justify-end">
-                <Avatar src={postData?.userId?.profileImage} alt="avatar" />
+                <Avatar
+                  src={postData?.userId?.profileImage || defaultProImg}
+                  alt="avatar"
+                />
                 <div className="mt-3 ml-2">
                   <Typography
                     variant="h6"
@@ -102,46 +106,51 @@ export function PostContentCard() {
               {postData?.description}
             </Typography>
             <div className="grid grid-cols-2 gap-x-4">
-              <div className="flex justify-start">
-                <Typography className="text-gray-600">
+              <div className="flex justify-start  gap-4">
+                <Typography>
                   <Chip
-                    variant="gradient"
+                    variant="ghost"
+                    size="sm"
                     value="Location"
-                    className="w-24 p-2 mr-5 flex justify-center"
+                    className="flex justify-center"
                   />
                 </Typography>
                 <Typography>{postData?.location}</Typography>
               </div>
-              <div className="flex justify-start mt-1">
+              <div className="flex justify-start mt-1 gap-4">
                 <Typography className="text-gray-600">
                   <Chip
-                    variant="gradient"
+                    variant="ghost"
+                    size="sm"
                     value="Start Date"
-                    className="w-24 p-2 mr-5 flex justify-center"
+                    className="flex justify-center"
                   />
                 </Typography>
                 <Typography>{formatDate(postData?.startDate)}</Typography>
               </div>
-              <div className="flex justify-start">
+              <div className="flex justify-start gap-4">
                 <Typography className="text-gray-600">
                   <Chip
-                    variant="gradient"
+                    variant="ghost"
+                    size="sm"
                     value="End Date"
-                    className="w-24 p-2 mr-5 flex justify-center"
+                    className="flex justify-center"
                   />
                 </Typography>
                 <Typography>{formatDate(postData?.endDate)}</Typography>
               </div>
-              <div className="flex justify-start mt-1">
+              <div className="flex justify-start mt-1 gap-10 ">
                 <Typography className="text-gray-600">
                   <Chip
-                    variant="gradient"
+                    variant="ghost"
+                    size="sm"
                     value="Budget"
-                    className="w-24 p-2 mr-5 flex justify-center"
+                    className=" flex justify-center"
                   />
                 </Typography>
                 <Typography>
-                  {postData?.amount} {postData?.currency}
+                  {postData?.currency}
+                  {postData?.amount}
                 </Typography>
               </div>
             </div>
@@ -151,7 +160,7 @@ export function PostContentCard() {
             <List className="mt-2">
               {postData && postData?.itinerary ? (
                 postData?.itinerary.map((item, i) => (
-                  <Accordion key={item._id} open={open === i + 1} >
+                  <Accordion key={item._id} open={open === i + 1}>
                     <AccordionHeader
                       onClick={() => handleOpen(i + 1)}
                       className="text-sm"
@@ -168,17 +177,16 @@ export function PostContentCard() {
               )}
             </List>
 
-            <div className="flex justify-start">
+            <div className="flex justify-start items-center gap-4 mt-1">
               <Typography className="text-gray-600">
                 <Chip
-                  variant="gradient"
+                  variant="ghost"
+                  size="sm"
                   value="Max Number of People"
-                  className="w-40 p-2 mr-5 flex justify-center"
+                  className="px-2 py-1  flex justify-center"
                 />
               </Typography>
-              <Typography className="mt-1">
-                {postData?.maxNoOfPeoples}
-              </Typography>
+              <Typography>{postData?.maxNoOfPeoples}</Typography>
             </div>
           </div>
         )}

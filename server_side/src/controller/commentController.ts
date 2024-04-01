@@ -50,7 +50,8 @@ export const commentController = {
       const allComments = await CommentModel.find({postId}).populate({
         path:'userId', select: '_id name   profileImage'
       }).skip(skipValue).limit(limitValue).sort({createdAt:-1})
-      
+
+      console.log(allComments,"ll")
       if(!allComments){
         return res.status(404).json({error:"Failed to get all comments with the specified Post Id"})
       }
