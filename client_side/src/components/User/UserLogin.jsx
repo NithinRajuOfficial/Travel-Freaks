@@ -86,9 +86,8 @@ export function LoginForm({ closeLoginModal, openSignupModal }) {
   const handleEmailSubmit = async (email) => {
     try {
       setIsEmail(email);
-      const response = await api.post("auth/sendOtp", { email: email });
+      await api.post("auth/sendOtp", { email: email });
       openOtpModal();
-      console.log(response);
       setIsVerification(true);
       showSuccess("Email address is verified");
     } catch (error) {

@@ -81,15 +81,15 @@ export function PostContentCard() {
         ) : (
           <div>
             {postData?.userId?._id !== userData?._id ? (
-              <div className="flex justify-end">
+              <div className="flex justify-end items-center gap-1 mb-2">
                 <Avatar
+                  className="w-8 h-8"
                   src={postData?.userId?.profileImage || defaultProImg}
                   alt="avatar"
                 />
-                <div className="mt-3 ml-2">
+                <div>
                   <Typography
-                    variant="h6"
-                    className="hover:cursor-pointer"
+                    className="text-sm sm:text-base font-semibold hover:cursor-pointer"
                     onClick={() => postCreatorProfile(postData?.userId?._id)}
                   >
                     {postData?.userId?.name}
@@ -105,8 +105,8 @@ export function PostContentCard() {
             <Typography className="text-gray-700 mb-4">
               {postData?.description}
             </Typography>
-            <div className="grid grid-cols-2 gap-x-4">
-              <div className="flex justify-start  gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="flex  justify-start gap-10 sm:gap-4">
                 <Typography>
                   <Chip
                     variant="ghost"
@@ -117,7 +117,7 @@ export function PostContentCard() {
                 </Typography>
                 <Typography>{postData?.location}</Typography>
               </div>
-              <div className="flex justify-start mt-1 gap-4">
+              <div className="flex justify-start gap-7 sm:gap-4">
                 <Typography className="text-gray-600">
                   <Chip
                     variant="ghost"
@@ -128,7 +128,7 @@ export function PostContentCard() {
                 </Typography>
                 <Typography>{formatDate(postData?.startDate)}</Typography>
               </div>
-              <div className="flex justify-start gap-4">
+              <div className="flex justify-start gap-11 sm:gap-4">
                 <Typography className="text-gray-600">
                   <Chip
                     variant="ghost"
@@ -139,7 +139,7 @@ export function PostContentCard() {
                 </Typography>
                 <Typography>{formatDate(postData?.endDate)}</Typography>
               </div>
-              <div className="flex justify-start mt-1 gap-10 ">
+              <div className="flex justify-start gap-14 sm:gap-4">
                 <Typography className="text-gray-600">
                   <Chip
                     variant="ghost"

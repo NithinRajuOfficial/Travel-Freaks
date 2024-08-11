@@ -19,7 +19,6 @@ export default function OAuth() {
 
       const result = await signInWithPopup(auth, provider);
       if (result.user) {
-        console.log("Successfully signed in with Google:", result.user);
         const userDataObj = {
           name: result.user.displayName,
           email: result.user.email,

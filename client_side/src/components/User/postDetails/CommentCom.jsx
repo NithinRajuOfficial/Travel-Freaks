@@ -25,7 +25,6 @@ export function CommentCard() {
   const [totalNoOfComments, setTotalNoOfComments] = useState(0);
   const [reload, setReload] = useState(false);
   const navigate = useNavigate();
-  console.log(user,'ll')
   const addComment = async () => {
     
     if (!user) {
@@ -78,7 +77,6 @@ export function CommentCard() {
       fetchInitialComments();
     }
   }, [postData, clickedShowMore, reload]);
-  console.log(currPage);
   // to get the commented users profile
   const commentedUserProfile = (userId) => {
     try {
@@ -109,13 +107,13 @@ export function CommentCard() {
   };
 
   return (
-    <div className=" h-full w-96 mt-10 ml-10">
+    <div className="h-full w-full sm:w-96 sm:mt-14 px-6 sm:p-0">
       <img
-        className="h-96 w-full rounded-lg object-cover object-center"
+        className="rounded-lg object-cover object-center"
         src={postData?.image}
         alt="nature image"
       />
-      <Card className="mt-6 w-96">
+      <Card className="mt-6 w-full sm:w-96">
         <List>
           {comments?.map((comment) => (
             <ListItem key={comment._id} className="hover:cursor-auto">

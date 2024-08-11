@@ -25,7 +25,7 @@ export function LoginModal({ isOpen, onRequestClose }) {
   const modalStyles = {
     content: {
       width: "90%",
-      height: "70%",
+      height: "75%",
       maxWidth: "420px",
       margin: "auto",
       backgroundColor: "transparent",

@@ -10,8 +10,9 @@ export function Profile() {
     <>
       <NavbarDefault />
       <CoverProfileImageDetails userId={userId}/>
-      {/* <FollowersList /> */}
+      <div className="relative sm:top-24 top-96">
       <HomePosts location={"profile"} otherUserId={userId} />
+      </div>
     </>
   );
 }

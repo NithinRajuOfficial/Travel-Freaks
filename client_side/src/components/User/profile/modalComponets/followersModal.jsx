@@ -87,11 +87,11 @@ export default function FollowersModal({
           boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
           height: "80vh",
           minWidth: "300px",
-          maxWidth: "80%",
+          maxWidth: "90%",
         },
       }}
     >
-      <div className="flex justify-end">
+      <div className="flex justify-end p-2">
         <Button
           className="rounded-full h-8 w-8 flex justify-center items-center "
           onClick={closeFollowersModal}
@@ -113,12 +113,13 @@ export default function FollowersModal({
           followersList.map((user) => (
             <Card
               key={user?.data?._id}
-              className="w-80 h-20 mt-5 shadow-2xl hover:shadow-3xl transition duration-300 ease-in-out transform hover:-translate-y-1"
+              className="w-72 sm:w-80 h-20 mt-5 shadow-2xl hover:shadow-3xl transition duration-300 ease-in-out transform hover:-translate-y-1"
             >
               <List>
                 <ListItem className="cursor-default">
                   <ListItemPrefix>
                     <Avatar
+                    className="w-12 h-10 sm:w-12 sm:h-12"
                       variant="circular"
                       alt={user?.data?.name}
                       src={
@@ -139,7 +140,7 @@ export default function FollowersModal({
                     </Link>
                   </div>
                   <span
-                    className="flex justify-end hover:cursor-pointer"
+                    className="flex text-sm justify-end hover:cursor-pointer"
                     onClick={() => handleFollowUnfollow(user?.data?._id)}
                   >
                     {userFollowStatus[user.data?._id] ? (

@@ -43,7 +43,6 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
     amount: "",
     maxNoOfPeoples: 0,
   };
-  
 
   const validationSchema = postFormInputValidations;
 
@@ -51,7 +50,6 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
     initialValues,
     validationSchema,
     onSubmit: async (values) => {
-      console.log(values, "///");
       const formData = new FormData();
       formData.append("title", values.title);
       formData.append("description", values.description);
@@ -91,14 +89,11 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
     try {
       dispatch(fetchPostStart());
       setStatus(true);
-      console.log("came")
-      console.log(formData,"[[[[[[")
       const response = await api.patch(
         `user/editPost/${postData._id}`,
         formData
       );
       const updatedPostData = response.data?.post;
-      console.log(updatedPostData, "))))))))))");
       dispatch(fetchPostSuccess(updatedPostData));
       onSuccess();
       showSuccess("Post Edited Successfully");
@@ -205,8 +200,8 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
             <InputTag data={amount} formik={formik} status={status} />
           </div>
         </div>
-        <div className="flex justify-between sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-          <div className="w-80">
+        <div className="flex justify-between flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+          <div className="sm:w-96">
             <InputTag
               data={maxNumberOfPeoples}
               formik={formik}
@@ -254,7 +249,8 @@ export function PostCreationForm({ onSuccess, postData, isEdit }) {
           {isEdit ? "Update Post" : "Create Post"}
         </Button>
       </form>
-      <Spinner color="indigo"
+      <Spinner
+        color="indigo"
         className={`h-16 w-16 text-gray-900/50  absolute top-1/2 left-1/2 ${
           !status ? "hidden" : ""
         }`}

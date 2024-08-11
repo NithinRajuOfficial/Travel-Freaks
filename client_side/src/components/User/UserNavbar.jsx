@@ -55,7 +55,6 @@ export function NavbarDefault() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = React.useState(false);
   // const [isChatListModalOpen, setIsChatListModalOpen] = React.useState(false);
-  console.log(userData, "ooo");
   // Define the logout function
   const handleLogout = async () => {
     try {
@@ -383,7 +382,7 @@ export function NavbarDefault() {
         >
           <div ref={modalContentRef} className="flex justify-end">
             <Button
-              className="rounded-full h-8 w-8 flex justify-center items-center mt-1 "
+              className="rounded-full h-2 w-2 flex justify-center items-center mt-2 mr-2 mb-2 "
               onClick={closeModal}
               color="gray"
               style={{ cursor: "pointer" }}
@@ -391,7 +390,6 @@ export function NavbarDefault() {
               X
             </Button>
           </div>
-          <div></div>
           <div className="flex flex-col items-center">
             <Typography variant="h5">Find Your Fellow Travelers</Typography>
             {allUsers.length === 0 ? (
@@ -404,12 +402,13 @@ export function NavbarDefault() {
               allUsers.map((user) => (
                 <Card
                   key={user._id}
-                  className="w-80 h-20 mt-5 shadow-2xl hover:shadow-3xl transition duration-300 ease-in-out transform hover:-translate-y-1"
+                  className="w-64 sm:w-80 mt-5 shadow-2xl hover:shadow-3xl transition duration-300 ease-in-out transform hover:-translate-y-1"
                 >
                   <List>
                     <ListItem className="cursor-default">
                       <ListItemPrefix>
                         <Avatar
+                        className="w-14 h-10 sm:h-12"
                           variant="circular"
                           alt={user._id}
                           src={user.profileImage || defaultProImg}
@@ -441,8 +440,8 @@ export function NavbarDefault() {
                             <svg
                               viewBox="0 0 64 64"
                               fill="currentColor"
-                              height="2em"
-                              width="2em"
+                              height="1.5em"
+                              width="1.5em"
                             >
                               <g
                                 fill="none"
@@ -472,8 +471,8 @@ export function NavbarDefault() {
                             <svg
                               viewBox="0 0 64 64"
                               fill="currentColor"
-                              height="2em"
-                              width="2em"
+                              height="1.5em"
+                              width="1.5em"
                             >
                               <g
                                 fill="none"

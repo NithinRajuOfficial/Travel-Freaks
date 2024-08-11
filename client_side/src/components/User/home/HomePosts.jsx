@@ -20,6 +20,7 @@ import {
   fetchPostFailure,
 } from "../../../redux/postSlice";
 import SkeletonLoading from "./PostsSkeleton";
+import { showError } from "../../../assets/tostify";
 
 export function HomePosts({ location, otherUserId }) {
   const navigate = useNavigate();
@@ -60,7 +61,6 @@ export function HomePosts({ location, otherUserId }) {
   const fetchingPostDetails = async (postId) => {
     try {
       dispatch(fetchPostStart());
-      console.log(postId);
       const response = await api.get(`user/postDetails?postId=${postId}`);
       const postData = response.data.postDetails;
       dispatch(fetchPostSuccess(postData));
@@ -81,6 +81,9 @@ export function HomePosts({ location, otherUserId }) {
   }, [posts]);
 
   const handleLikeAndUnlike = async (postId) => {
+    if (!userData) {
+      showError("Please register an account");
+    }
     try {
       const response = await api.post(`user/likeOrUnlike/${postId}`);
       const currentLikeStatus = response.data.currentLikeStatus;
@@ -103,7 +106,7 @@ export function HomePosts({ location, otherUserId }) {
   //   .map((_, index) => <SkeletonLoading key={index} />);
   return (
     <>
-      <div className="m-auto mt-40 flex flex-row flex-wrap justify-center">
+      <div className="ml-4 sm:ml-0 mt-0 sm:mt-40 flex flex-row flex-wrap justify-center sm:gap-10">
         {loading ? (
           <div className="flex flex-row m-24">
             {Array(3)
@@ -116,7 +119,7 @@ export function HomePosts({ location, otherUserId }) {
           filteredPosts.slice(0, visiblePosts).map((post) => (
             <Card
               key={post.id}
-              className={`h-full w-full max-w-[26rem] shadow-lg mb-10 mr-5`}
+              className={`h-full w-full max-w-[26rem] shadow-lg mb-10 ml-1 mr-5 sm:ml-0 sm:mr-0  hover:scale-105 hover:shadow-2xl duration-300`}
             >
               <CardHeader floated={false} color="blue-gray">
                 <img
@@ -142,9 +145,9 @@ export function HomePosts({ location, otherUserId }) {
                     <text
                       x="50%"
                       y="50%"
-                      text-anchor="middle"
+                      textAnchor="middle"
                       dy=".3em"
-                      font-size="10"
+                      fontSize="10"
                       fill={likeStatus[post._id] ? "white" : "black"}
                     >
                       {post.likes.length == 0 ? "" : post.likes.length}
@@ -153,7 +156,7 @@ export function HomePosts({ location, otherUserId }) {
                 </IconButton>
               </CardHeader>
               <CardBody>
-                <div className="mb-3 flex items-center justify-between">
+                <div>
                   <Typography
                     variant="h5"
                     color="blue-gray"
@@ -163,10 +166,9 @@ export function HomePosts({ location, otherUserId }) {
                   </Typography>
                 </div>
               </CardBody>
-              <CardFooter className="pt-3">
+              <CardFooter className="pt-3 flex justify-end">
                 <Button
-                  size="lg"
-                  fullWidth={true}
+                  size="sm"
                   onClick={() => {
                     fetchingPostDetails(post._id);
                   }}

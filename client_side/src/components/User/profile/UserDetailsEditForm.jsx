@@ -55,8 +55,15 @@ export function UserDetailsEditForm({
         return true;
       }),
       bio: Yup.string()
-      .required("Bio is required")
-      .trim(),
+    .required("Bio is required")
+    .trim()
+    .test("wordCount", "Bio must be 50 words or less", (value) => {
+      if (value) {
+        const wordCount = value.trim().split(/\s+/).length;
+        return wordCount <= 50;
+      }
+      return true;
+    }),
     name: Yup.string()
       .required("Name is required")
       .trim(),
@@ -96,6 +103,8 @@ export function UserDetailsEditForm({
     initialValues,
     validationSchema,
     onSubmit,
+    validateOnChange: true,
+    validateOnBlur: true,
   });
 
   const handleImageChange = (e) => {

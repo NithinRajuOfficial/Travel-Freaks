@@ -3,7 +3,7 @@ import { carouselData } from "../../../assets/constants";
  
 export function HomeCarousel() {
   return (
-    <Carousel className="rounded-xl">
+    <Carousel className="rounded-xl -z-0">
       {carouselData.map((elm,i)=>(
         <div key={i} className="relative h-96 w-full">
         <img
